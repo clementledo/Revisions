@@ -1,0 +1,55 @@
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+
+import { Card, Muted, Row, Screen } from '@/components/ui';
+import { courseById } from '@/lib/courses';
+
+/** Liste des récaps ou des calculateurs d'un cours, chapitre par chapitre. */
+export default function List() {
+  const { id, kind } = useLocalSearchParams<{ id: string; kind: 'recap' | 'calc' }>();
+  const course = courseById(id)!;
+  const router = useRouter();
+  const lessons = course.lessons.map((l) => course.chapters.find((c) => c.id === l)!);
+
+  if (kind === 'calc') {
+    const items = lessons.flatMap((ch) => ch.widgets.map((w) => ({ ch, w })));
+    return (
+      <Screen>
+        <Stack.Screen options={{ title: 'Calculateurs' }} />
+        <Muted>Les calculateurs de ta page : change les valeurs, le calcul se refait pas à pas.</Muted>
+        <Card style={{ paddingVertical: 4 }}>
+          {items.map(({ ch, w }) => (
+            <Row
+              key={w.id}
+              icon="calculator-variant-outline"
+              color={course.color}
+              title={w.title}
+              sub={ch.eyebrow + ' · ' + ch.title}
+              onPress={() => router.push(`/cours/${id}/lire?ch=${ch.id}&anchor=${w.id}`)}
+            />
+          ))}
+        </Card>
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen>
+      <Stack.Screen options={{ title: 'Récaps' }} />
+      <Muted>L’essentiel, les formules, les pièges et ce que tu dois savoir faire, pour chaque cours.</Muted>
+      <Card style={{ paddingVertical: 4 }}>
+        {lessons
+          .filter((ch) => ch.hasRecap)
+          .map((ch) => (
+            <Row
+              key={ch.id}
+              icon="star-four-points-outline"
+              color={course.color}
+              title={ch.title}
+              sub={ch.eyebrow}
+              onPress={() => router.push(`/cours/${id}/lire?ch=${ch.id}&mode=recap`)}
+            />
+          ))}
+      </Card>
+    </Screen>
+  );
+}

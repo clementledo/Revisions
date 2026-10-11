@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=830">
+<title>Antisèche MTI881</title>
+<style>
+  @page { size: A4 portrait; margin: 7mm; }
+  :root { --ink: #111; --acc: #0e6b63; --warn: #a8560c; --line: #c9d1cf; --soft: #eef5f3; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--ink); }
+  body { font: 8.3pt/1.3 "Helvetica Neue", Arial, sans-serif; }
+  .sheet { width: 196mm; min-height: 283mm; margin: 0 auto; padding: 0; page-break-after: always; break-after: page; }
+  .sheet:last-child { page-break-after: auto; break-after: auto; }
+  header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1.5px solid var(--ink); padding-bottom: 1mm; margin-bottom: 1.5mm; }
+  header b { font-size: 10pt; letter-spacing: .02em; }
+  header span { font-size: 7pt; color: #555; }
+  .cols { column-count: 3; column-gap: 3mm; column-rule: .5px solid var(--line); }
+  section { break-inside: avoid-column; margin-bottom: 1.6mm; }
+  h2 { font-size: 9.2pt; margin: 0 0 .6mm; padding: .4mm 1.2mm; background: var(--acc); color: #fff; border-radius: 1mm; }
+  h3 { font-size: 8.5pt; margin: 1mm 0 .3mm; color: var(--acc); }
+  p, ul { margin: .3mm 0; }
+  ul { padding-left: 3mm; }
+  li { margin: .15mm 0; }
+  .m { margin: .4mm 0; overflow: hidden; }
+  .m svg, p svg, li svg { max-width: 100%; height: auto; vertical-align: middle; }
+  mjx-container[display="true"] { margin: .3mm 0 !important; }
+  .warn { color: var(--warn); }
+  .box { background: var(--soft); border-radius: 1mm; padding: .6mm 1.2mm; margin: .5mm 0; }
+  code { font: 7.6pt/1.2 Menlo, Consolas, monospace; }
+  table { border-collapse: collapse; width: 100%; font-size: 7.7pt; }
+  td, th { border: .5px solid var(--line); padding: .2mm .8mm; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  @media screen {
+    html { background: #d9dedc; }
+    .sheet { background: #fff; padding: 7mm; margin: 4mm auto; box-shadow: 0 1px 5px rgba(0,0,0,.2); width: 210mm; min-height: 297mm; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================= RECTO ========================= -->
+<div class="sheet">
+<header><b>MTI881 · Apprentissage par renforcement · Antisèche</b><span>Recto · cours 1 à 3</span></header>
+<div class="cols">
+
+<section>
+<h2>C1 · Le RL en bref</h2>
+<ul>
+<li>Apprendre un <b>comportement</b> par interaction : agent → action ; environnement → observation + récompense scalaire.</li>
+<li>≠ supervisé : pas d'étiquette, les actions changent les données futures.</li>
+<li>3 difficultés : données <b>non IID</b> · <b>exploration / exploitation</b> · récompense <b>différée</b> (attribution du crédit).</li>
+<li>Agent = le décideur seul. Environnement = tout le reste (corps du robot inclus). Observation ≠ état (partielle, bruitée).</li>
+<li>Récompense = définit le succès, pas le comportement. On maximise la récompense <b>cumulée</b>.</li>
+<li>Bitter Lesson : les méthodes générales + calcul battent les connaissances codées à la main.</li>
+</ul>
+</section>
+
+<section>
+<h2>C1 · MP → MRP → MDP → RL</h2>
+<table>
+<tr><th>MP</th><td>états + transitions</td></tr>
+<tr><th>MRP</th><td>+ récompenses + γ</td></tr>
+<tr><th>MDP</th><td>+ actions : P(s′|s,a), R(s,a,s′)</td></tr>
+<tr><th>RL</th><td>trouver la politique au rendement max par l'expérience</td></tr>
+</table>
+<p><b>Markov</b> : \(P(S_{t+1}|S_t,\dots,S_0)=P(S_{t+1}|S_t)\). Dépend de la représentation (météo + saison).</p>
+<p>Matrice de transition : les <b>lignes</b> somment à 1. MDP : tableau 3D \(|S|\times|S|\times|A|\).</p>
+<p>Deux pas : \(P(S_2=j|S_0=i)=\sum_kP_{ik}P_{kj}\)</p>
+</section>
+
+<section>
+<h2>C1 · Rendement, valeur, politique</h2>
+\[ G_t=\sum_{k\ge0}\gamma^kR_{t+k+1} \qquad V(s)=\mathbb E[G_t\mid S_t=s] \]
+<p>\(\sum_k\gamma^k=\frac1{1-\gamma}\) (γ = 0.9 → 10 ; γ = 0.95 → 20). γ = 0 : myope. γ = 1 sans fin → infini.</p>
+<p>Ex. 2, −1, 5, γ = 0.9 : 2 − 0.9 + 4.05 = 5.15.</p>
+<p>\(\pi(a|s)=P(A_t=a|S_t=s)\) ; fixer π → MRP :</p>
+\[ P^\pi(s'|s)=\sum_a\pi(a|s)P(s'|s,a) \]
+\[ R^\pi(s,s')=\sum_a\pi(a|s)R(s,a,s') \]
+<p class="warn">⚠ Une action fixe la <b>distribution</b> de l'état suivant, pas l'état. Même récompense immédiate ≠ même valeur.</p>
+</section>
+
+<section>
+<h2>C2a · Gymnasium</h2>
+<p><code>obs, info = env.reset(seed=42)</code><br><code>obs, r, terminated, truncated, info = env.step(a)</code><br><code>env = gym.make("CartPole-v1")</code></p>
+<ul>
+<li>Espaces : <code>Discrete(n)</code> (0…n−1) · <code>Box</code> (tenseur borné) · <code>Tuple</code>. Méthodes <code>sample()</code>, <code>contains()</code>, <code>shape</code>, <code>seed()</code>.</li>
+<li><b>terminated</b> = fin naturelle ; <b>truncated</b> = limite externe (temps). Les deux → <code>reset()</code>.</li>
+<li>reset() renvoie 2 valeurs, step() en renvoie 5.</li>
+<li>CartPole : 2 actions, 4 obs continues, +1 par pas, max 500. Aléatoire ≈ 12–15 pas.</li>
+<li>Atari : <code>Deterministic</code>, <code>NoFrameskip</code>, <code>-ram</code>.</li>
+<li>Wrappers : modifient obs / récompense / action, s'imbriquent. <code>RandomActionWrapper</code> = exploration ε.</li>
+<li>Rendu : <code>render_mode="rgb_array"</code> + <code>HumanRendering</code> / <code>RecordVideo</code>.</li>
+</ul>
+</section>
+
+<section>
+<h2>C2b · PyTorch</h2>
+<ul>
+<li>Tenseurs (float32 en DL), broadcasting, méthodes <code>_</code> sur place. <code>flatten(start_dim=1)</code>, <code>permute</code>, <code>unsqueeze(0)</code>.</li>
+<li>Même device pour modèle et données (<code>.to(device)</code>), retour CPU avant NumPy.</li>
+<li>Autograd : <code>requires_grad=True</code>, graphe dynamique, <code>backward()</code> = règle de la chaîne, gradients <b>accumulés</b> dans <code>.grad</code>.</li>
+<li><code>nn.Module</code> : couches dans <code>__init__</code>, calcul dans <code>forward()</code>. <code>nn.Sequential</code>. <code>state_dict()</code>.</li>
+<li>Pertes : MSE (régression), CrossEntropy (logits bruts), BCE (binaire). Optim : SGD, RMSprop, Adam.</li>
+</ul>
+<div class="box"><code>optimizer.zero_grad(); loss.backward(); optimizer.step()</code><br>Éval : <code>model.eval()</code> + <code>torch.no_grad()</code> · <code>argmax(dim=1)</code> = classe · nb lots = ⌈N / taille⌉</div>
+<p class="warn">⚠ Pas de softmax avant CrossEntropyLoss · oublier zero_grad → gradients additionnés · eval() ne coupe pas autograd · CPU + CUDA mélangés → erreur.</p>
+</section>
+
+<section>
+<h2>C3 · Taxonomie</h2>
+<p>3 axes : <b>model-free / model-based</b> · <b>value-based / policy-based</b> · <b>on-policy / off-policy</b>. Acteur–critique = politique + valeur.</p>
+<p>CEM = model-free, policy-based, on-policy : simple, robuste, peu efficace en données.</p>
+</section>
+
+<section>
+<h2>C3 · Méthode de l'entropie croisée</h2>
+<ol style="padding-left:3.5mm;margin:.3mm 0">
+<li>Jouer N épisodes avec le réseau (action <b>échantillonnée</b> selon softmax, pas argmax).</li>
+<li>Seuil = centile ρ des retours : <code>np.percentile(rewards, 70)</code>.</li>
+<li>Garder les élites (retour ≥ seuil).</li>
+<li>Entraîner sur les paires (obs, action) élites avec l'entropie croisée (classification, action = étiquette).</li>
+</ol>
+<p>CartPole : 128 neurones, 16 épisodes, centile 70, Adam lr 0.01 → moyenne 475 en ≈ 50 itérations.</p>
+<p><b>FrozenLake échoue</b> : récompense éparse et binaire → seuil 0. Correctifs : gros lots · score actualisé \(r\cdot\gamma^T\) · garder les élites · lr ÷ 10 · plus d'entraînement → ≈ 55 %.</p>
+<p class="warn">⚠ Seuil 0 avec ≥ garderait les échecs → <b>&gt;</b> strict. Centile haut = moins de données mais meilleures.</p>
+<h3>Justification</h3>
+\[ \mathbb E_p[H]=\mathbb E_q\!\left[\tfrac{p}{q}H\right] \]
+\[ D_{KL}(p\|q)=\mathbb E_p[\log p]-\mathbb E_p[\log q] \]
+<p>Minimiser la KL vers les élites = minimiser l'entropie croisée → indicateur \(\mathbb 1[R\ge\psi]\) devant \(\log\pi\) :</p>
+\[ -\log\pi_\theta(x)=-\sum_t\log\pi_\theta(a_t|s_t)+c \]
+</section>
+
+</div>
+</div>
+
+<!-- ========================= VERSO ========================= -->
+<div class="sheet">
+<header><b>MTI881 · Antisèche</b><span>Verso · cours 4 à 6</span></header>
+<div class="cols">
+
+<section>
+<h2>C4 · Valeurs et Bellman</h2>
+<p>\(V^\pi(s)\) : rendement espéré en suivant π depuis s. \(Q^\pi(s,a)\) : faire a puis suivre π.</p>
+\[ V^\pi=\sum_a\pi(a|s)\,Q^\pi(s,a) \]
+\[ Q^\pi(s,a)=\sum_{s'}p(s'|s,a)[r+\gamma V^\pi(s')] \]
+\[ V^*(s)=\max_a\sum_{s'}p(s'|s,a)[r+\gamma V^*(s')] \]
+\[ Q^*(s,a)=\sum_{s'}p(s'|s,a)[r+\gamma\max_{a'}Q^*(s',a')] \]
+<ul>
+<li>Gourmand sur r immédiat = piège (+2 puis −20) : comparer \(r+\gamma V(s')\).</li>
+<li>Politique fixée → système <b>linéaire</b> ; avec max → non linéaire.</li>
+<li>Avec Q*, politique optimale = argmax, sans modèle.</li>
+<li>Cycle s₁⇄s₂ (γ = 0.9) : \(V(s_1)=\frac{1+2\gamma}{1-\gamma^2}\approx14.74\).</li>
+<li>Amélioration : si π′ est au moins aussi bonne en une étape partout, π′ ≥ π.</li>
+</ul>
+</section>
+
+<section>
+<h2>C4 · Itération de valeurs / Q-itération</h2>
+<ul>
+<li>Partir de 0, appliquer Bellman en boucle → V* si γ &lt; 1.</li>
+<li>Modèle estimé par comptage : \(\hat p(s'|s,a)=\frac{N(s,a,s')}{\sum_xN(s,a,x)}\)</li>
+<li>FrozenLake : 100 pas aléatoires → mise à jour → 20 épisodes de test (sur un <b>test_env</b> séparé).</li>
+<li>Tables : récompenses par (s,a,s′), transitions par (s,a), valeurs par s.</li>
+<li>Q-itération : stocke Q(s,a) (4× plus), action = argmax directe.</li>
+<li>≈ 65 % vs 55 % (CEM) sur 8×8. Limites : états discrets et peu nombreux, modèle requis, récompenses éparses.</li>
+</ul>
+</section>
+
+<section>
+<h2>C5 · Q-learning tabulaire</h2>
+\[ y=r+\gamma\max_{a'}Q(s',a')\quad(y=r\text{ si terminal}) \]
+\[ Q\leftarrow(1-\alpha)Q+\alpha y=Q+\alpha(y-Q) \]
+<ul>
+<li>Sans modèle, une entrée mise à jour par transition. α = taux d'apprentissage (descente sur ½(y − Q)²), cible mobile.</li>
+<li>TD(0) · <b>SARSA</b> : \(Q(s_{t+1},a_{t+1})\), on-policy (action jouée) · <b>Q-learning</b> : max, off-policy.</li>
+<li>FrozenLake ≈ 3000 itérations.</li>
+</ul>
+</section>
+
+<section>
+<h2>C5 · DQN</h2>
+\[ L=\big(Q_\theta(s,a)-[r+\gamma\max_{a'}\hat Q_{\bar\theta}(s',a')]\big)^2 \]
+\[ \epsilon_t=\max(\epsilon_f,\ \epsilon_s-t/\beta) \]
+<table>
+<tr><th>Défi</th><th>Solution</th></tr>
+<tr><td>exploration</td><td>ε-greedy décroissant</td></tr>
+<tr><td>corrélation</td><td>tampon de rejeu</td></tr>
+<tr><td>cible mobile</td><td>réseau cible (sync)</td></tr>
+<tr><td>obs. partielle</td><td>4 images empilées</td></tr>
+</table>
+<p>Atari : conv 32-64-64 → flatten 3136 → 512 → |A|. Sortie conv \(\lfloor(n-k)/s\rfloor+1\) : 84 → 20 → 9 → 7, 64·7·7 = 3136.</p>
+<p>γ 0.99 · lot 32 · tampon 10 000 · lr 1e-4 · sync 1000 · ε 1 → 0.01 sur 150 000 frames.</p>
+<p><code>net(s).gather(1, a.unsqueeze(-1)).squeeze(-1)</code> · <code>tgt(s′).max(1)[0]</code></p>
+<p class="warn">⚠ <code>next_values[dones] = 0</code> · cible sous <code>no_grad</code> · attendre REPLAY_START_SIZE · SARSA ≠ Q-learning.</p>
+</section>
+
+<section>
+<h2>C6 · Extensions (Rainbow)</h2>
+<h3>N pas</h3>
+\[ y_t=\sum_{k=0}^{n-1}\gamma^kr_{t+k}+\gamma^n\max_{a'}\hat Q(s_{t+n},a') \]
+<p>Propagation plus rapide ; n = 2–3 aide ; grand n = variance (actions intermédiaires non optimales).</p>
+<h3>Double DQN</h3>
+\[ y=r+\gamma\hat Q\big(s',\arg\max_aQ(s',a)\big) \]
+<p>Q choisit, Q̂ évalue → moins de surestimation. Change la cible, pas l'architecture.</p>
+<h3>Réseaux bruités</h3>
+<p>\(w=\mu+\sigma\epsilon,\ \epsilon\sim\mathcal N(0,1)\) ; μ, σ appris (pas ε). Exploration dépendante de l'état, plus de calendrier ε.</p>
+<h3>Rejeu prioritaire (PER)</h3>
+\[ p_i=|\delta_i|+\varepsilon_p,\quad P(i)=\frac{p_i^\alpha}{\sum_kp_k^\alpha},\quad w_i=(N\,P(i))^{-\beta} \]
+<p>β → 1. α = 0 → tirage uniforme. Gain surtout en début d'entraînement.</p>
+<h3>Dueling</h3>
+\[ Q=V+A-\tfrac1{|A|}\textstyle\sum_{a'}A(s,a') \]
+<p>Deux têtes sur un tronc CNN ; centrer A rend V, A identifiables.</p>
+<h3>Catégorique (C51)</h3>
+<p>51 atomes sur [−10, 10] ; perte = entropie croisée ; moins bon que DQN sur Pong.</p>
+\[ \Delta z=\frac{V_{max}-V_{min}}{N-1},\quad Q=\sum_ip_iz_i \]
+\[ \hat z=\text{clip}(r+\gamma z_j),\ b=\frac{\hat z-V_{min}}{\Delta z} \]
+<p>\(l=\lfloor b\rfloor,\ u=\lceil b\rceil\) : \(m_l\mathrel{+}=(u-b)p_j\), \(m_u\mathrel{+}=(b-l)p_j\).</p>
+</section>
+
+</div>
+</div>
+</body>
+</html>

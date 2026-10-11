@@ -1,0 +1,75 @@
+name: APK Android
+
+on:
+  # Fabrication seulement à la demande (« go » de Clement), pas à chaque envoi de code.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      # Numéro de version (v1.0.N), lu par app.config.js à la génération du projet et au moment
+      # où Gradle emballe le code JS : il doit être défini pour tout le job.
+      REVISIONS_BUILD: ${{ github.run_number }}
+      # Signature de l'APK : secrets optionnels. Sans eux, l'APK est signé avec la clé de
+      # débogage du modèle Expo, identique d'une fabrication à l'autre mais publique.
+      REVISIONS_KEYSTORE_BASE64: ${{ secrets.REVISIONS_KEYSTORE_BASE64 }}
+      REVISIONS_KEYSTORE_PASSWORD: ${{ secrets.REVISIONS_KEYSTORE_PASSWORD }}
+      REVISIONS_KEY_ALIAS: revisions
+      REVISIONS_KEY_PASSWORD: ${{ secrets.REVISIONS_KEYSTORE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Préparer le contenu des cours
+        run: node scripts/build-content.mjs
+
+      - name: Vérifier le code
+        run: |
+          npx tsc --noEmit
+          npx eslint .
+
+      - name: Préparer la clé de signature
+        if: env.REVISIONS_KEYSTORE_BASE64 != ''
+        run: |
+          echo "$REVISIONS_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/revisions.keystore"
+          echo "REVISIONS_KEYSTORE=$RUNNER_TEMP/revisions.keystore" >> "$GITHUB_ENV"
+
+      - name: Générer le projet Android
+        run: npx expo prebuild --platform android --no-install
+        env:
+          CI: 1
+
+      - name: Fabriquer l'APK
+        working-directory: android
+        # Seulement arm64 (Samsung S24 FE et téléphones récents) : APK environ 3 fois plus léger.
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a
+
+      - name: Publier l'APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="v1.0.${{ github.run_number }}"
+          cp android/app/build/outputs/apk/release/app-release.apk "Revisions-$VERSION.apk"
+          gh release create "$VERSION" "Revisions-$VERSION.apk" \
+            --title "Révisions $VERSION" \
+            --notes "Version fabriquée depuis ${GITHUB_SHA::7}. Télécharge l'APK ci-dessous sur ton téléphone Android et installe-le."

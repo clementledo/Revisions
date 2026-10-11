@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<style>
+  :root { --bg: #e9eceb; --ink: #16202a; --muted: #586572; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px system-ui, sans-serif; }
+  #pages { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px 0 80px; }
+  .page { position: relative; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.15); border-radius: 4px; overflow: hidden; }
+  .page canvas { display: block; width: 100%; height: 100%; }
+  .page .n { position: absolute; right: 8px; bottom: 6px; font-size: 11px; color: #8a949c; }
+  #msg { padding: 40px 20px; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="msg">Ouverture des slides…</div>
+<div id="pages"></div>
+<script type="text/plain" id="pdfjs-lib">/*PDFJS_LIB*/</script>
+<script type="text/plain" id="pdfjs-worker">/*PDFJS_WORKER*/</script>
+<script>
+(async function () {
+  const cfg = window.__PDF || {};
+  if (cfg.bg) document.documentElement.style.setProperty('--bg', cfg.bg);
+  if (cfg.muted) document.documentElement.style.setProperty('--muted', cfg.muted);
+  const post = (m) => window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(m));
+  const blobUrl = (id) => URL.createObjectURL(new Blob([document.getElementById(id).textContent], { type: 'text/javascript' }));
+  const msg = document.getElementById('msg');
+  try {
+    const pdfjs = await import(blobUrl('pdfjs-lib'));
+    pdfjs.GlobalWorkerOptions.workerSrc = blobUrl('pdfjs-worker');
+    // Lecture du fichier local (file://) en mémoire.
+    const data = await new Promise((ok, ko) => {
+      const x = new XMLHttpRequest();
+      x.open('GET', cfg.uri);
+      x.responseType = 'arraybuffer';
+      x.onload = () => (x.response ? ok(new Uint8Array(x.response)) : ko(new Error('vide')));
+      x.onerror = () => ko(new Error('lecture impossible'));
+      x.send();
+    });
+    const doc = await pdfjs.getDocument({ data, isEvalSupported: false }).promise;
+    msg.remove();
+    const box = document.getElementById('pages');
+    const width = Math.min(window.innerWidth - 16, 900);
+    const ratio = Math.min(window.devicePixelRatio || 1, 2.5);
+    const first = await doc.getPage(1);
+    const vp1 = first.getViewport({ scale: 1 });
+    const height = (width * vp1.height) / vp1.width;
+    const slots = [];
+    for (let n = 1; n <= doc.numPages; n++) {
+      const d = document.createElement('div');
+      d.className = 'page';
+      d.style.width = width + 'px';
+      d.style.height = height + 'px';
+      d.dataset.n = n;
+      d.innerHTML = '<span class="n">' + n + ' / ' + doc.numPages + '</span>';
+      box.appendChild(d);
+      slots.push(d);
+    }
+    const drawn = new Set();
+    async function draw(d) {
+      const n = +d.dataset.n;
+      if (drawn.has(n)) return;
+      drawn.add(n);
+      const page = n === 1 ? first : await doc.getPage(n);
+      const vp0 = page.getViewport({ scale: 1 });
+      const vp = page.getViewport({ scale: (width / vp0.width) * ratio });
+      const c = document.createElement('canvas');
+      c.width = vp.width;
+      c.height = vp.height;
+      d.style.height = (width * vp0.height) / vp0.width + 'px';
+      d.prepend(c);
+      await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    }
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && draw(e.target)),
+      { rootMargin: '1200px 0px' },
+    );
+    slots.forEach((d) => io.observe(d));
+    // Page courante (pour reprendre là où on s'était arrêté).
+    let current = 0;
+    const seen = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting && +e.target.dataset.n !== current) {
+            current = +e.target.dataset.n;
+            post({ type: 'page', page: current });
+          }
+        }),
+      { threshold: 0.5 },
+    );
+    slots.forEach((d) => seen.observe(d));
+    window.goToPage = (n) => slots[Math.max(0, Math.min(slots.length, n) - 1)].scrollIntoView();
+    if (cfg.page > 1) setTimeout(() => window.goToPage(cfg.page), 50);
+    post({ type: 'loaded', pages: doc.numPages });
+  } catch (e) {
+    msg.textContent = "Impossible d'ouvrir ce PDF (" + e.message + ').';
+    post({ type: 'error', message: String(e.message || e) });
+  }
+})();
+</script>
+</body>
+</html>
