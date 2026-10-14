@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-import { Button, Card, Chip, Empty, Muted, Row, Screen } from '@/components/ui';
+import { Button, Empty, Group, Muted, Row, Screen, Segmented } from '@/components/ui';
 import { courseById } from '@/lib/courses';
 import { DOCS_KEY, formatSize, importDocs, removeDoc, type Doc } from '@/lib/docs';
 import { useAssetUri } from '@/lib/pages';
@@ -47,9 +47,15 @@ export default function CheatSheet() {
 
   return (
     <View style={{ flex: 1, backgroundColor: p.bg }}>
-      <View style={{ flexDirection: 'row', gap: 8, padding: space.lg, paddingBottom: space.sm }}>
-        {course.antiseche != null && <Chip label="Ma version (Claude)" active={tab === 'claude'} color={course.color} onPress={() => setTab('claude')} />}
-        <Chip label={`La mienne${mine.length ? ` (${mine.length})` : ''}`} active={tab === 'mine'} color={course.color} onPress={() => setTab('mine')} />
+      <View style={{ paddingHorizontal: 18, paddingTop: space.md, paddingBottom: space.sm }}>
+        <Segmented
+          options={[
+            ...(course.antiseche != null ? [{ id: 'claude' as const, label: 'Version Claude', icon: 'auto-fix' as const }] : []),
+            { id: 'mine' as const, label: `La mienne${mine.length ? ` (${mine.length})` : ''}`, icon: 'account-edit-outline' as const },
+          ]}
+          value={tab}
+          onChange={setTab}
+        />
       </View>
 
       {tab === 'claude' ? (
@@ -68,15 +74,15 @@ export default function CheatSheet() {
           ) : (
             <ActivityIndicator style={{ flex: 1 }} color={p.accent} />
           )}
-          <View style={{ flexDirection: 'row', gap: space.sm, padding: space.lg }}>
-            <Button style={{ flex: 1 }} kind="soft" icon="printer-outline" label="Imprimer" disabled={busy} onPress={() => exportPdf(false)} />
-            <Button style={{ flex: 1 }} icon="share-variant" label="PDF" color={course.color} disabled={busy} onPress={() => exportPdf(true)} />
+          <View style={{ flexDirection: 'row', gap: space.sm, paddingHorizontal: 18, paddingTop: space.md, paddingBottom: space.lg, borderTopWidth: 1, borderTopColor: p.line, backgroundColor: p.surface }}>
+            <Button style={{ flex: 1 }} kind="soft" color={course.color} icon="printer-outline" label="Imprimer" disabled={busy} onPress={() => exportPdf(false)} />
+            <Button style={{ flex: 1 }} icon="share-variant" label="Partager en PDF" color={course.color} disabled={busy} onPress={() => exportPdf(true)} />
           </View>
         </>
       ) : (
         <Screen>
           {mine.length ? (
-            <Card style={{ paddingVertical: 2 }}>
+            <Group>
               {mine.map((d) => (
                 <Row
                   key={d.id}
@@ -101,13 +107,14 @@ export default function CheatSheet() {
                   }
                 />
               ))}
-            </Card>
+            </Group>
           ) : (
             <Empty icon="file-document-edit-outline" title="Ta propre antisèche" sub="Ajoute ta feuille en PDF ou en photo (recto et verso) depuis ton téléphone ou ton Drive." />
           )}
           <Button
             label="Ajouter mon antisèche"
             icon="plus"
+            size="lg"
             color={course.color}
             onPress={() => importDocs({ course: id, kind: 'antiseche', images: true })}
           />

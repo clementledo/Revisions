@@ -51,7 +51,7 @@ export default function PdfScreen() {
 
   if (!viewer) return <ActivityIndicator style={{ flex: 1, backgroundColor: p.bg }} color={p.accent} />;
 
-  const config = `window.__PDF=${JSON.stringify({ uri: doc.uri, page: read<number>(posKey, 1), bg: p.dark ? '#0d1115' : '#e9eceb', muted: p.muted })};true;`;
+  const config = `window.__PDF=${JSON.stringify({ uri: doc.uri, page: read<number>(posKey, 1), bg: p.dark ? p.bg : p.surface2, muted: p.muted })};true;`;
   return (
     <View style={{ flex: 1, backgroundColor: p.bg }}>
       {header}

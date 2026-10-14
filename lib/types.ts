@@ -39,6 +39,10 @@ export type Course = {
   title: string;
   subtitle: string;
   color: string;
+  /** Icône du cours (MaterialCommunityIcons). */
+  icon: string;
+  /** Date de l'examen final (AAAA-MM-JJ), si connue. */
+  exam?: string;
   /** Page de révision embarquée (assets/pages/<id>.html), absente tant que le contenu n'est pas fourni. */
   page?: number;
   antiseche?: number;

@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, View } from 'react-native';
 
-import { Button, Card, Chip, Empty, H2, Icon, Muted, Row, Screen } from '@/components/ui';
+import { Button, Chip, Empty, Group, Icon, Muted, Row, Screen, Section } from '@/components/ui';
 import { courseById } from '@/lib/courses';
 import { DOCS_KEY, editDoc, formatSize, importDocs, removeDoc, type Doc } from '@/lib/docs';
 import { useStored } from '@/lib/store';
@@ -37,11 +37,11 @@ export default function Slides() {
 
   return (
     <Screen>
-      <Muted>
+      <Muted style={{ paddingHorizontal: 2 }}>
         Choisis tes PDF dans le sélecteur (Google Drive y apparaît). Ils sont copiés dans l’app et rangés d’après leur nom, par exemple «
         {course.code}_Cours3_….pdf ».
       </Muted>
-      <Button label="Ajouter des slides" icon="plus" color={course.color} onPress={add} />
+      <Button label="Ajouter des slides" icon="plus" size="lg" color={course.color} onPress={add} />
 
       {!mine.length && <Empty icon="presentation" title="Aucune slide pour l'instant" sub="Tu peux en choisir plusieurs d'un coup." />}
 
@@ -49,9 +49,8 @@ export default function Slides() {
         const list = mine.filter((d) => (d.chapter ?? undefined) === g.id);
         if (!list.length) return null;
         return (
-          <View key={g.id ?? 'autres'} style={{ gap: space.sm }}>
-            <H2>{g.title}</H2>
-            <Card style={{ paddingVertical: 2 }}>
+          <Section key={g.id ?? 'autres'} title={g.title}>
+            <Group>
               {list.map((d) => (
                 <View key={d.id}>
                   <Row
@@ -67,7 +66,7 @@ export default function Slides() {
                     }
                   />
                   {editing === d.id && (
-                    <View style={{ gap: space.sm, paddingBottom: space.md }}>
+                    <View style={{ gap: space.sm, paddingBottom: space.md, paddingHorizontal: 16 }}>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                         {groups.map((x) => (
                           <Chip
@@ -98,8 +97,8 @@ export default function Slides() {
                   )}
                 </View>
               ))}
-            </Card>
-          </View>
+            </Group>
+          </Section>
         );
       })}
     </Screen>

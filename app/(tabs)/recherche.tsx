@@ -2,9 +2,9 @@ import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
-import { Card, Empty, H1, H2, Icon, Screen } from '@/components/ui';
+import { Empty, Group, Icon, Screen, Section } from '@/components/ui';
 import { COURSES } from '@/lib/courses';
-import { makeStyles, radius, space, useTheme } from '@/lib/theme';
+import { makeStyles, radius, shadow, tone, type, useTheme } from '@/lib/theme';
 
 // Comparaison sans accents ni majuscules, en gardant la même longueur que le texte d'origine.
 const fold = (s: string) =>
@@ -74,7 +74,11 @@ function search(q: string): Hit[] {
   return hits;
 }
 
-const KIND = { cours: 'Dans le cours', carte: 'Cartes mémoire', question: 'Questions' } as const;
+const KIND = {
+  cours: { label: 'Dans le cours', icon: 'book-open-page-variant-outline' },
+  carte: { label: 'Cartes mémoire', icon: 'cards-outline' },
+  question: { label: 'Questions', icon: 'format-list-checks' },
+} as const;
 
 export default function Search() {
   const router = useRouter();
@@ -84,9 +88,8 @@ export default function Search() {
   const hits = useMemo(() => search(q), [q]);
 
   return (
-    <Screen top>
-      <H1>Recherche</H1>
-      <View style={s.box}>
+    <Screen title="Recherche">
+      <View style={[s.box, shadow(p)]}>
         <Icon name="magnify" size={22} color={p.muted} />
         <TextInput
           value={q}
@@ -111,22 +114,26 @@ export default function Search() {
         const list = hits.filter((h) => h.kind === k);
         if (!list.length) return null;
         return (
-          <View key={k} style={{ gap: space.sm }}>
-            <H2>{`${KIND[k]} · ${list.length}`}</H2>
-            {list.slice(0, 30).map((h) => (
-              <Card key={h.key} onPress={() => router.push(h.go as never)} style={{ gap: 4 }}>
-                <Text style={[s.code, { color: h.color }]}>{h.code}</Text>
-                <Text style={s.title} numberOfLines={2}>
-                  {h.title}
-                </Text>
-                <Text style={s.snippet} numberOfLines={3}>
-                  {h.before}
-                  <Text style={{ backgroundColor: p.warnSoft, color: p.text, fontWeight: '700' }}>{h.match}</Text>
-                  {h.after}
-                </Text>
-              </Card>
-            ))}
-          </View>
+          <Section key={k} title={`${KIND[k].label} · ${list.length}`}>
+            <Group inset={16}>
+              {list.slice(0, 30).map((h) => (
+                <Pressable key={h.key} onPress={() => router.push(h.go as never)} style={({ pressed }) => [s.hit, pressed && { backgroundColor: p.surface2 }]}>
+                  <View style={s.hitHead}>
+                    <Icon name={KIND[k].icon} size={14} color={tone(h.color, p)} />
+                    <Text style={[s.code, { color: tone(h.color, p) }]}>{h.code}</Text>
+                  </View>
+                  <Text style={s.title} numberOfLines={2}>
+                    {h.title}
+                  </Text>
+                  <Text style={s.snippet} numberOfLines={3}>
+                    {h.before}
+                    <Text style={{ backgroundColor: p.warnSoft, color: p.text, fontWeight: '700' }}>{h.match}</Text>
+                    {h.after}
+                  </Text>
+                </Pressable>
+              ))}
+            </Group>
+          </Section>
         );
       })}
     </Screen>
@@ -139,13 +146,15 @@ const useStyles = makeStyles((p) => ({
     alignItems: 'center',
     gap: 10,
     backgroundColor: p.surface,
-    borderWidth: 1,
+    borderWidth: p.dark ? 1 : 0,
     borderColor: p.line,
     borderRadius: radius.lg,
     paddingHorizontal: 14,
   },
   input: { flex: 1, fontFamily: 'Inter', fontSize: 16, color: p.text, paddingVertical: 13 },
-  code: { fontFamily: 'Inter', fontSize: 11.5, fontWeight: '800', letterSpacing: 1 },
-  title: { fontFamily: 'Inter', fontSize: 15.5, fontWeight: '700', color: p.text },
+  hit: { paddingHorizontal: 16, paddingVertical: 13, gap: 3 },
+  hitHead: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  code: { ...type.overline, fontSize: 10.5 },
+  title: { ...type.bodyStrong, color: p.text },
   snippet: { fontFamily: 'Inter', fontSize: 14, color: p.muted, lineHeight: 20 },
 }));

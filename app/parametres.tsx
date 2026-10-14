@@ -1,88 +1,148 @@
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 
 import { UpdateBanner } from '@/components/UpdateBanner';
-import { Button, Card, Chip, H2, Icon, Muted, Screen } from '@/components/ui';
+import { Group, Icon, Press, Row, Screen, Section, Segmented } from '@/components/ui';
 import { clearAll, read, useStored, write } from '@/lib/store';
-import { THEMES, makeStyles, radius, space, useTheme, type ThemeId } from '@/lib/theme';
+import { DARK_THEMES, LIGHT_THEMES, THEMES, makeStyles, radius, shadow, space, type, useTheme, type ThemeId, type ThemeMode } from '@/lib/theme';
 import { currentVersion } from '@/lib/update';
 
 const SIZES = [
-  { v: 0.9, l: 'Petit' },
-  { v: 1, l: 'Normal' },
-  { v: 1.12, l: 'Grand' },
-  { v: 1.25, l: 'Très grand' },
+  { id: 0.9, label: 'Petit' },
+  { id: 1, label: 'Normal' },
+  { id: 1.12, label: 'Grand' },
+  { id: 1.25, label: 'Très grand' },
+];
+
+const MODES: { id: ThemeMode; label: string; icon: 'white-balance-sunny' | 'weather-night' | 'theme-light-dark' }[] = [
+  { id: 'light', label: 'Clair', icon: 'white-balance-sunny' },
+  { id: 'dark', label: 'Sombre', icon: 'weather-night' },
+  { id: 'auto', label: 'Auto', icon: 'theme-light-dark' },
 ];
 
 export default function Settings() {
-  const { id, p, set } = useTheme();
+  const { p, mode, lightId, darkId, setTheme, setMode } = useTheme();
   const s = useStyles();
   const [fontScale, setFontScale] = useStored('fontScale', 1);
 
   return (
     <Screen>
       <UpdateBanner />
-      <H2>Thème</H2>
-      <View style={s.themes}>
-        {(Object.keys(THEMES) as ThemeId[]).map((t) => {
+
+      <Section title="Apparence">
+        <Segmented options={MODES} value={mode} onChange={setMode} />
+        {mode === 'auto' && <Text style={s.hint}>Suit le réglage clair ou sombre du téléphone.</Text>}
+      </Section>
+
+      <Section title="Thèmes clairs">
+        <Swatches ids={LIGHT_THEMES} selected={lightId} on={mode !== 'dark'} />
+      </Section>
+
+      <Section title="Thèmes sombres">
+        <Swatches ids={DARK_THEMES} selected={darkId} on={mode !== 'light'} />
+      </Section>
+
+      <Section title="Taille du texte des cours">
+        <Segmented options={SIZES} value={fontScale} onChange={setFontScale} />
+      </Section>
+
+      <Section title="Données">
+        <Group>
+          <Row
+            icon="cellphone-check"
+            color={p.good}
+            title="Enregistré sur le téléphone"
+            sub="Cartes, QCM et chapitres lus. Les slides importées restent aussi sur ton Drive."
+          />
+          <Row
+            icon="restore"
+            color={p.bad}
+            title="Remettre la progression à zéro"
+            onPress={() =>
+              Alert.alert('Tout remettre à zéro ?', 'Cartes, QCM, chapitres lus et série seront effacés. Les documents importés et le thème restent.', [
+                { text: 'Annuler', style: 'cancel' },
+                {
+                  text: 'Effacer',
+                  style: 'destructive',
+                  onPress: () => {
+                    const keep = ['docs', 'theme', 'themeDark', 'themeMode', 'fontScale'];
+                    const saved = keep.map((k) => [k, read<unknown>(k, null)] as const);
+                    clearAll();
+                    saved.forEach(([k, v]) => v != null && write(k, v));
+                  },
+                },
+              ])
+            }
+          />
+        </Group>
+      </Section>
+
+      <View style={s.about}>
+        <View style={[s.logo, { backgroundColor: p.accent }]}>
+          <Icon name="school-outline" size={22} color={p.onAccent} />
+        </View>
+        <Text style={s.aboutTitle}>Révisions</Text>
+        <Text style={s.hint}>Version {currentVersion()} · faite pour l’ETS</Text>
+      </View>
+    </Screen>
+  );
+
+  function Swatches({ ids, selected, on }: { ids: ThemeId[]; selected: ThemeId; on: boolean }) {
+    return (
+      <View style={s.grid}>
+        {ids.map((t) => {
           const th = THEMES[t].palette;
+          const sel = t === selected;
           return (
-            <Pressable key={t} onPress={() => set(t)} style={[s.theme, { backgroundColor: th.bg, borderColor: id === t ? p.accent : p.line }]}>
-              <View style={[s.swatchCard, { backgroundColor: th.surface, borderColor: th.line }]}>
-                <View style={[s.swatchLine, { backgroundColor: th.accent, width: '55%' }]} />
-                <View style={[s.swatchLine, { backgroundColor: th.muted, opacity: 0.5 }]} />
-                <View style={[s.swatchLine, { backgroundColor: th.muted, opacity: 0.3, width: '70%' }]} />
+            <Press
+              key={t}
+              onPress={() => setTheme(t)}
+              style={[s.theme, shadow(p), { borderColor: sel ? (on ? p.accent : p.muted) : p.dark ? p.line : 'transparent' }]}>
+              <View style={[s.preview, { backgroundColor: th.bg }]}>
+                <View style={[s.previewHero, { backgroundColor: th.hero[0] }]}>
+                  <View style={[s.previewDot, { backgroundColor: 'rgba(255,255,255,0.85)' }]} />
+                  <View style={[s.previewLine, { backgroundColor: 'rgba(255,255,255,0.55)', width: '60%' }]} />
+                </View>
+                <View style={[s.previewCard, { backgroundColor: th.surface, borderColor: th.line }]}>
+                  <View style={[s.previewDot, { backgroundColor: th.accent }]} />
+                  <View style={{ flex: 1, gap: 3 }}>
+                    <View style={[s.previewLine, { backgroundColor: th.text, opacity: 0.75, width: '80%' }]} />
+                    <View style={[s.previewLine, { backgroundColor: th.muted, opacity: 0.5, width: '55%' }]} />
+                  </View>
+                </View>
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Text style={[s.themeName, { color: th.text }]}>{THEMES[t].name}</Text>
-                {id === t && <Icon name="check-circle" size={15} color={th.accent} />}
+              <View style={s.themeFoot}>
+                <Text style={[s.themeName, sel && { color: p.text }]} numberOfLines={1}>
+                  {THEMES[t].name}
+                </Text>
+                {sel && <Icon name="check-circle" size={16} color={on ? p.accent : p.muted} />}
               </View>
-            </Pressable>
+            </Press>
           );
         })}
       </View>
-
-      <H2>Taille du texte des cours</H2>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-        {SIZES.map((x) => (
-          <Chip key={x.v} label={x.l} active={fontScale === x.v} onPress={() => setFontScale(x.v)} />
-        ))}
-      </View>
-
-      <H2>Données</H2>
-      <Card>
-        <Muted>Ta progression (cartes, QCM, chapitres lus) est enregistrée sur le téléphone. Les slides importées restent aussi sur ton Drive.</Muted>
-        <Button
-          kind="ghost"
-          color={p.bad}
-          icon="restore"
-          label="Remettre la progression à zéro"
-          onPress={() =>
-            Alert.alert('Tout remettre à zéro ?', 'Cartes, QCM, chapitres lus et série seront effacés. Les documents importés restent.', [
-              { text: 'Annuler', style: 'cancel' },
-              {
-                text: 'Effacer',
-                style: 'destructive',
-                onPress: () => {
-                  const keep = ['docs', 'theme', 'fontScale'];
-                  const saved = keep.map((k) => [k, read<unknown>(k, null)] as const);
-                  clearAll();
-                  saved.forEach(([k, v]) => v != null && write(k, v));
-                },
-              },
-            ])
-          }
-        />
-      </Card>
-
-      <Muted style={{ textAlign: 'center', marginTop: space.lg }}>Révisions v{currentVersion()} · fait pour l’ETS</Muted>
-    </Screen>
-  );
+    );
+  }
 }
 
 const useStyles = makeStyles((p) => ({
-  themes: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
-  theme: { width: '31.5%', borderWidth: 2, borderRadius: radius.lg, padding: 10, gap: 8 },
-  swatchCard: { borderRadius: 8, borderWidth: 1, padding: 8, gap: 5 },
-  swatchLine: { height: 5, borderRadius: 3, width: '100%' },
-  themeName: { fontFamily: 'Inter', fontSize: 13, fontWeight: '700' },
+  hint: { ...type.caption, color: p.muted, paddingHorizontal: 2 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  theme: {
+    width: '31.3%',
+    backgroundColor: p.surface,
+    borderRadius: radius.lg,
+    borderWidth: 2,
+    padding: 5,
+    gap: 6,
+  },
+  preview: { borderRadius: radius.md - 2, padding: 6, gap: 5, overflow: 'hidden' },
+  previewHero: { borderRadius: 7, height: 26, padding: 6, flexDirection: 'row', alignItems: 'center', gap: 5 },
+  previewCard: { borderRadius: 7, borderWidth: 1, padding: 6, flexDirection: 'row', alignItems: 'center', gap: 5 },
+  previewDot: { width: 10, height: 10, borderRadius: 5 },
+  previewLine: { height: 4, borderRadius: 2 },
+  themeFoot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4, paddingBottom: 3, gap: 4 },
+  themeName: { fontFamily: 'Inter', fontSize: 13, fontWeight: '700', color: p.text2, flexShrink: 1 },
+  about: { alignItems: 'center', gap: 6, marginTop: space.lg },
+  logo: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  aboutTitle: { ...type.headline, color: p.text },
 }));

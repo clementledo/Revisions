@@ -17,6 +17,7 @@ export const COURSES: Course[] = [
     title: 'Apprentissage par renforcement',
     subtitle: 'Cours 1 à 6 · A2026',
     color: '#0e6b63',
+    icon: 'robot-outline',
     page: require('@/assets/pages/mti881.html'),
     antiseche: require('@/assets/pages/mti881-antiseche.html'),
     chapters: mti881Chapters,
@@ -29,8 +30,10 @@ export const COURSES: Course[] = [
     id: 'mgl805',
     code: 'MGL805',
     title: 'Qualité logicielle',
-    subtitle: 'Examen final · 17 octobre',
+    subtitle: 'Assurance qualité · A2026',
     color: '#4c5bd4',
+    icon: 'shield-check-outline',
+    exam: '2026-10-17',
     page: require('@/assets/pages/mgl805.html'),
     antiseche: require('@/assets/pages/mgl805-antiseche.html'),
     chapters: mgl805Chapters,
@@ -58,6 +61,7 @@ export const COURSES: Course[] = [
     title: 'Gestion des services TI',
     subtitle: 'Contenu à venir',
     color: '#c46a1a',
+    icon: 'server-network',
     chapters: [],
     lessons: [],
     quizChapters: {},
@@ -68,3 +72,18 @@ export const COURSES: Course[] = [
 
 export const courseById = (id: string) => COURSES.find((c) => c.id === id);
 export const chapterLabel = (c: { eyebrow: string; id: string }) => c.eyebrow || c.id.toUpperCase();
+
+/** Jours avant l'examen (0 = aujourd'hui), ou null s'il est passé ou inconnu. */
+export function daysToExam(c: Course, now = new Date()) {
+  if (!c.exam) return null;
+  const [y, m, d] = c.exam.split('-').map(Number);
+  const exam = new Date(y, m - 1, d);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const n = Math.round((exam.getTime() - today.getTime()) / 86400000);
+  return n >= 0 ? n : null;
+}
+
+export const examLabel = (c: Course) => {
+  const [y, m, d] = c.exam!.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('fr-CA', { weekday: 'long', day: 'numeric', month: 'long' });
+};

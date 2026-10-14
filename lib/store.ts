@@ -1,4 +1,4 @@
-import Storage from 'expo-sqlite/kv-store';
+import Storage from '@/lib/kv';
 import { useCallback, useSyncExternalStore } from 'react';
 
 // Petit magasin clé → JSON, synchrone (SQLite), avec abonnements pour rafraîchir les écrans.

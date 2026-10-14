@@ -1,13 +1,13 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useRef, useState } from 'react';
-import { Animated, Pressable, Text, View } from 'react-native';
+import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Bar, Button, Empty, Icon } from '@/components/ui';
+import { Bar, Button, Empty, Icon, Pill, Ring, Stat } from '@/components/ui';
 import { COURSES, courseById } from '@/lib/courses';
 import { read } from '@/lib/store';
 import { dueCards, nextLabel, rateCard, srsKey, type Rating, type SrsMap } from '@/lib/study';
-import { makeStyles, radius, space, useTheme } from '@/lib/theme';
+import { alpha, makeStyles, radius, shadow, space, tone, type, useTheme } from '@/lib/theme';
 import type { Card, Course } from '@/lib/types';
 
 const SESSION = 25;
@@ -65,19 +65,35 @@ export default function Flashcards() {
     return (
       <View style={{ flex: 1, backgroundColor: p.bg, justifyContent: 'center' }}>
         <Stack.Screen options={{ title }} />
-        <Empty icon="party-popper" title="Séance terminée" sub={`${score.good} cartes sues · ${score.again} à revoir plus tard`}>
-          <Button label="Continuer" icon="cards" onPress={() => {
-            setQueue(buildSession(courseId, ch, false));
-            setIndex(0);
-          }} />
+        <View style={{ paddingHorizontal: 18, gap: space.md }}>
+          <View style={[s.done, shadow(p, 2)]}>
+            <Ring value={score.good / Math.max(1, score.good + score.again)} size={120} stroke={10} color={p.good}>
+              <Icon name="party-popper" size={40} color={p.good} />
+            </Ring>
+            <Text style={s.doneTitle}>Séance terminée</Text>
+            <View style={{ flexDirection: 'row', alignSelf: 'stretch' }}>
+              <Stat value={String(score.good)} label="cartes sues" color={p.good} />
+              <Stat value={String(score.again)} label="à revoir plus tard" color={p.bad} />
+            </View>
+          </View>
+          <Button
+            label="Continuer"
+            icon="cards"
+            size="lg"
+            onPress={() => {
+              setQueue(buildSession(courseId, ch, false));
+              setIndex(0);
+            }}
+          />
           <Button label="Retour" kind="ghost" onPress={() => router.back()} />
-        </Empty>
+        </View>
       </View>
     );
   }
 
   const state = read<SrsMap>(srsKey(item.course.id), {})[item.card.id];
-  const chapter = item.course.chapters.find((c) => c.id === item.card.ch);
+  const chapter = item.course.chapters.find((x) => x.id === item.card.ch);
+  const c = tone(item.course.color, p);
 
   const turn = () => {
     Animated.spring(flip, { toValue: flipped ? 0 : 1, useNativeDriver: true, friction: 8, tension: 60 }).start();
@@ -94,6 +110,9 @@ export default function Flashcards() {
 
   const front = flip.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] });
   const back = flip.interpolate({ inputRange: [0, 1], outputRange: ['180deg', '360deg'] });
+  // Cache la face arrière même là où backfaceVisibility n'est pas pris en charge.
+  const frontOp = flip.interpolate({ inputRange: [0, 0.5, 0.501, 1], outputRange: [1, 1, 0, 0] });
+  const backOp = flip.interpolate({ inputRange: [0, 0.5, 0.501, 1], outputRange: [0, 0, 1, 1] });
 
   const RATES: { r: Rating; label: string; color: string }[] = [
     { r: 'again', label: 'À revoir', color: p.bad },
@@ -106,41 +125,51 @@ export default function Flashcards() {
     <View style={{ flex: 1, backgroundColor: p.bg, paddingBottom: insets.bottom + space.lg }}>
       <Stack.Screen options={{ title }} />
       <View style={s.top}>
-        <Bar value={Math.min(index, total) / Math.max(1, total)} color={item.course.color} />
+        <View style={{ flex: 1 }}>
+          <Bar value={Math.min(index, total) / Math.max(1, total)} color={c} />
+        </View>
         <Text style={s.count}>
           {Math.min(index + 1, queue.length)} / {queue.length}
         </Text>
       </View>
 
-      <Pressable style={s.stage} onPress={turn}>
-        <Animated.View style={[s.card, { transform: [{ perspective: 1200 }, { rotateY: front }] }]}>
-          <Meta />
-          <Text style={s.q}>{item.card.q}</Text>
-          <View style={s.hint}>
-            <Icon name="gesture-tap" size={18} color={p.muted} />
-            <Text style={s.hintText}>Touche pour voir la réponse</Text>
-          </View>
-        </Animated.View>
-        <Animated.View style={[s.card, s.backCard, { transform: [{ perspective: 1200 }, { rotateY: back }] }]}>
-          <Meta />
-          <Text style={s.qSmall}>{item.card.q}</Text>
-          <View style={[s.sep, { backgroundColor: item.course.color }]} />
-          <Text style={s.a}>{item.card.a}</Text>
-        </Animated.View>
-      </Pressable>
+      <View style={s.stage}>
+        <Pressable style={s.deck} onPress={turn}>
+          <View style={[s.under, { backgroundColor: alpha(c, p.dark ? 0.14 : 0.1) }]} />
+          <Animated.View style={[s.card, shadow(p, 2), { opacity: frontOp, transform: [{ perspective: 1200 }, { rotateY: front }] }]}>
+            <Meta />
+            <Text style={s.q}>{item.card.q}</Text>
+            <View style={s.hint}>
+              <Icon name="gesture-tap" size={17} color={p.muted} />
+              <Text style={s.hintText}>Touche pour retourner</Text>
+            </View>
+          </Animated.View>
+          <Animated.View style={[s.card, s.backCard, shadow(p, 2), { opacity: backOp, transform: [{ perspective: 1200 }, { rotateY: back }] }]}>
+            <Meta />
+            <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: space.md }} showsVerticalScrollIndicator={false}>
+              <Text style={s.qSmall}>{item.card.q}</Text>
+              <View style={[s.sep, { backgroundColor: c }]} />
+              <Text style={s.a}>{item.card.a}</Text>
+            </ScrollView>
+          </Animated.View>
+        </Pressable>
+      </View>
 
       {flipped ? (
         <View style={s.rates}>
           {RATES.map(({ r, label, color }) => (
-            <Pressable key={r} onPress={() => rate(r)} style={({ pressed }) => [s.rate, { borderColor: color }, pressed && { backgroundColor: color + '22' }]}>
+            <Pressable
+              key={r}
+              onPress={() => rate(r)}
+              style={({ pressed }) => [s.rate, { backgroundColor: alpha(color, pressed ? 0.3 : p.dark ? 0.16 : 0.1) }]}>
               <Text style={[s.rateLabel, { color }]}>{label}</Text>
               <Text style={s.rateSub}>{nextLabel(state, r)}</Text>
             </Pressable>
           ))}
         </View>
       ) : (
-        <View style={{ paddingHorizontal: space.lg }}>
-          <Button label="Voir la réponse" color={item.course.color} onPress={turn} />
+        <View style={{ paddingHorizontal: 18 }}>
+          <Button label="Voir la réponse" size="lg" color={item.course.color} onPress={turn} />
         </View>
       )}
     </View>
@@ -149,20 +178,24 @@ export default function Flashcards() {
   function Meta() {
     return (
       <View style={s.meta}>
-        <Text style={[s.metaCode, { color: item.course.color }]}>{item.course.code}</Text>
+        <Text style={[s.metaCode, { color: c }]}>{item.course.code}</Text>
         <Text style={s.metaCh} numberOfLines={1}>
           {chapter?.eyebrow} · {chapter?.title}
         </Text>
-        {!state && <Text style={[s.new, { color: p.warn }]}>NOUVELLE</Text>}
+        {!state && <Pill label="Nouvelle" color={p.warn} />}
       </View>
     );
   }
 }
 
 const useStyles = makeStyles((p) => ({
-  top: { paddingHorizontal: space.lg, paddingTop: space.sm, gap: 6 },
-  count: { fontFamily: 'Inter', fontSize: 13, color: p.muted, fontWeight: '600', textAlign: 'right' },
-  stage: { flex: 1, margin: space.lg },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 18, paddingTop: space.md },
+  count: { fontFamily: 'Inter', fontSize: 13, color: p.muted, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  stage: { flex: 1, justifyContent: 'center', paddingHorizontal: 18, paddingVertical: space.lg },
+  deck: { flex: 1, maxHeight: 500 },
+  under: { position: 'absolute', left: 14, right: 14, bottom: -10, height: 40, borderRadius: radius.xl },
+  done: { backgroundColor: p.surface, borderRadius: radius.xl, borderWidth: p.dark ? 1 : 0, borderColor: p.line, alignItems: 'center', gap: space.lg, paddingVertical: 28 },
+  doneTitle: { ...type.title, color: p.text },
   card: {
     position: 'absolute',
     top: 0,
@@ -172,30 +205,24 @@ const useStyles = makeStyles((p) => ({
     backfaceVisibility: 'hidden',
     backgroundColor: p.surface,
     borderRadius: radius.xl,
-    borderWidth: 1,
+    borderWidth: p.dark ? 1 : 0,
     borderColor: p.line,
     padding: space.xl,
     gap: space.lg,
     justifyContent: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
   },
-  backCard: { justifyContent: 'flex-start', paddingTop: 64 },
+  backCard: { justifyContent: 'flex-start', paddingTop: 62, paddingBottom: space.xl },
   meta: { position: 'absolute', top: space.lg, left: space.xl, right: space.xl, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  metaCode: { fontFamily: 'Inter', fontSize: 12, fontWeight: '800', letterSpacing: 1 },
+  metaCode: { ...type.overline, fontSize: 11 },
   metaCh: { flex: 1, fontFamily: 'Inter', fontSize: 12, color: p.muted },
-  new: { fontFamily: 'Inter', fontSize: 11, fontWeight: '800', letterSpacing: 0.8 },
-  q: { fontFamily: 'Inter', fontSize: 22, fontWeight: '700', color: p.text, lineHeight: 30, textAlign: 'center', letterSpacing: -0.3 },
+  q: { fontFamily: 'Inter', fontSize: 22, fontWeight: '700', color: p.text, lineHeight: 30, textAlign: 'center', letterSpacing: -0.4 },
   qSmall: { fontFamily: 'Inter', fontSize: 15, fontWeight: '600', color: p.muted, lineHeight: 21 },
   sep: { height: 3, width: 40, borderRadius: 3 },
   a: { fontFamily: 'Inter', fontSize: 18.5, color: p.text, lineHeight: 27 },
   hint: { position: 'absolute', bottom: space.lg, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 },
   hintText: { fontFamily: 'Inter', fontSize: 13, color: p.muted },
-  rates: { flexDirection: 'row', gap: space.sm, paddingHorizontal: space.lg },
-  rate: { flex: 1, borderWidth: 1.5, borderRadius: radius.md, paddingVertical: 10, alignItems: 'center', gap: 2, backgroundColor: p.surface },
+  rates: { flexDirection: 'row', gap: space.sm, paddingHorizontal: 18 },
+  rate: { flex: 1, borderRadius: radius.md, paddingVertical: 12, alignItems: 'center', gap: 2 },
   rateLabel: { fontFamily: 'Inter', fontSize: 14, fontWeight: '700' },
   rateSub: { fontFamily: 'Inter', fontSize: 11.5, color: p.muted },
 }));

@@ -1,17 +1,52 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { NavigationBar } from 'expo-navigation-bar';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
+import { useColorScheme } from 'react-native';
 
 import { useStored } from '@/lib/store';
-import { THEMES, ThemeContext, type ThemeId } from '@/lib/theme';
+import { THEMES, ThemeContext, type ThemeId, type ThemeMode } from '@/lib/theme';
 
 export { ErrorBoundary } from 'expo-router';
 
 export default function RootLayout() {
-  const [stored, setTheme] = useStored<ThemeId>('theme', 'carnet');
-  const id = THEMES[stored] ? stored : 'carnet';
+  const system = useColorScheme();
+  // « theme » = thème clair choisi (ou ancien choix unique), « themeDark » = thème sombre, « themeMode » = clair / sombre / auto.
+  const [storedLight, setLight] = useStored<string>('theme', 'porcelaine');
+  const [storedDark, setDark] = useStored<string>('themeDark', '');
+  const [storedMode, setMode] = useStored<ThemeMode | ''>('themeMode', '');
+
+  const valid = (t: string, dark: boolean) => t in THEMES && THEMES[t as ThemeId].palette.dark === dark;
+  // Ancien réglage : un seul thème, parfois sombre.
+  const legacyDark = valid(storedLight, true) ? (storedLight as ThemeId) : null;
+  const lightId: ThemeId = valid(storedLight, false) ? (storedLight as ThemeId) : 'porcelaine';
+  const darkId: ThemeId = valid(storedDark, true) ? (storedDark as ThemeId) : (legacyDark ?? 'minuit');
+  const mode: ThemeMode = storedMode || (legacyDark ? 'dark' : 'light');
+  const isDark = mode === 'auto' ? system === 'dark' : mode === 'dark';
+  const id = isDark ? darkId : lightId;
   const p = THEMES[id].palette;
-  const ctx = useMemo(() => ({ id, p, set: setTheme }), [id, p, setTheme]);
+
+  const ctx = useMemo(
+    () => ({
+      id,
+      p,
+      mode,
+      lightId,
+      darkId,
+      setMode: (m: ThemeMode) => setMode(m),
+      setTheme: (t: ThemeId) => {
+        if (THEMES[t].palette.dark) {
+          setDark(t);
+          if (mode !== 'auto') setMode('dark');
+        } else {
+          setLight(t);
+          if (mode !== 'auto') setMode('light');
+        }
+      },
+    }),
+    [id, p, mode, lightId, darkId, setMode, setDark, setLight],
+  );
+
   const base = p.dark ? DarkTheme : DefaultTheme;
   const nav = {
     ...base,
@@ -28,13 +63,16 @@ export default function RootLayout() {
     <ThemeContext.Provider value={ctx}>
       <ThemeProvider value={nav}>
         <StatusBar style={p.dark ? 'light' : 'dark'} />
+        <NavigationBar style={p.dark ? 'dark' : 'light'} />
         <Stack
           screenOptions={{
             headerTintColor: p.text,
             headerShadowVisible: false,
             headerStyle: { backgroundColor: p.bg },
             headerTitleStyle: { fontFamily: 'Inter', fontWeight: '700', fontSize: 17 },
+            headerTitleAlign: 'center',
             contentStyle: { backgroundColor: p.bg },
+            animation: 'slide_from_right',
           }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="cours/[id]/index" options={{ title: '' }} />
