@@ -5,7 +5,7 @@ import { courseById } from '@/lib/courses';
 
 /** Liste des récaps ou des calculateurs d'un cours, chapitre par chapitre. */
 export default function List() {
-  const { id, kind } = useLocalSearchParams<{ id: string; kind: 'recap' | 'calc' }>();
+  const { id, kind } = useLocalSearchParams<{ id: string; kind: 'recap' | 'calc' | 'traps' }>();
   const course = courseById(id)!;
   const router = useRouter();
   const lessons = course.lessons.map((l) => course.chapters.find((c) => c.id === l)!);
@@ -27,6 +27,29 @@ export default function List() {
               onPress={() => router.push(`/cours/${id}/lire?ch=${ch.id}&anchor=${w.id}`)}
             />
           ))}
+        </Card>
+      </Screen>
+    );
+  }
+
+  if (kind === 'traps') {
+    return (
+      <Screen>
+        <Stack.Screen options={{ title: 'Pièges d’examen' }} />
+        <Muted>Les encadrés « piège » de ta page, partie par partie : ce que l’examen aime tester.</Muted>
+        <Card style={{ paddingVertical: 4 }}>
+          {lessons
+            .filter((ch) => ch.traps)
+            .map((ch) => (
+              <Row
+                key={ch.id}
+                icon="alert-outline"
+                color={course.color}
+                title={ch.title}
+                sub={`${ch.eyebrow}${ch.hot ? ' · ★ signalé par le prof' : ''} · ${ch.traps} piège${ch.traps > 1 ? 's' : ''}`}
+                onPress={() => router.push(`/cours/${id}/lire?ch=${ch.id}&mode=traps`)}
+              />
+            ))}
         </Card>
       </Screen>
     );

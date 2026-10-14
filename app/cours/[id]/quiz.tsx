@@ -14,10 +14,14 @@ const TYPES = [
   { id: 'qcm', label: 'QCM' },
   { id: 'vf', label: 'Vrai / Faux' },
   { id: 'num', label: 'Calcul' },
+  { id: 'fill', label: 'Texte à trous' },
 ] as const;
-const TLABEL = { qcm: 'QCM', vf: 'Vrai / Faux', num: 'Calcul', ex: 'Exercice' };
+const TLABEL = { qcm: 'QCM', vf: 'Vrai / Faux', num: 'Calcul', fill: 'Texte à trous', ex: 'Exercice' };
 
 type Item = { q: Question; i: number };
+
+/** « Cours 2 · partie A » → « C2A » ; les noms courts restent tels quels. */
+const shortLabel = (eyebrow: string) => eyebrow.replace('Cours ', 'C').replace(' · partie ', '');
 
 const shuffle = <T,>(a: T[]) => {
   const b = [...a];
@@ -72,7 +76,7 @@ export default function Quiz() {
           {course.lessons.map((l) => (
             <Chip
               key={l}
-              label={course.chapters.find((c) => c.id === l)!.eyebrow.replace('Cours ', 'C').replace(' · partie ', '')}
+              label={shortLabel(course.chapters.find((c) => c.id === l)!.eyebrow)}
               active={chapter === l}
               color={course.color}
               onPress={() => setChapter(l)}
@@ -81,7 +85,7 @@ export default function Quiz() {
         </View>
         <H2>Type de questions</H2>
         <View style={s.chips}>
-          {TYPES.map((t) => (
+          {TYPES.filter((t) => t.id === 'all' || course.questions.some((q) => q.t === t.id)).map((t) => (
             <Chip key={t.id} label={t.label} active={type === t.id} color={course.color} onPress={() => setType(t.id)} />
           ))}
         </View>
@@ -176,13 +180,15 @@ export default function Quiz() {
           </View>
         )}
 
-        {q.t === 'num' && (
+        {(q.t === 'num' || q.t === 'fill') && (
           <View style={{ flexDirection: 'row', gap: space.sm }}>
             <TextInput
               value={typed}
               onChangeText={setTyped}
               editable={!answered}
-              keyboardType="numeric"
+              keyboardType={q.t === 'num' ? 'numeric' : 'default'}
+              autoCapitalize="none"
+              autoCorrect={false}
               placeholder="Ta réponse"
               placeholderTextColor={p.muted}
               onSubmitEditing={() => typed && submit(typed)}

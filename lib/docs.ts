@@ -37,6 +37,8 @@ export function classify(name: string, fallbackCourse?: string): Pick<Doc, 'cour
 }
 
 function guessChapter(course: Course, n: string) {
+  const key = course.slideKeys?.find(([, re]) => re.test(n));
+  if (key) return key[0];
   const num = /(?:cours|chap(?:itre)?|ch|c|lecture|semaine|s)[\s_-]*0?(\d{1,2})/.exec(n)?.[1];
   if (!num) return undefined;
   const candidates = course.lessons

@@ -21,7 +21,7 @@ export function useAssetUri(mod: number | undefined) {
   return { uri, error };
 }
 
-export type PageMode = 'chapter' | 'recap' | 'examples' | 'all';
+export type PageMode = 'chapter' | 'recap' | 'examples' | 'traps' | 'all';
 
 export type PageOptions = {
   mode: PageMode;
@@ -38,12 +38,13 @@ export function pagePrelude(p: Palette, o: PageOptions) {
   const ch = o.chapter ? `#${o.chapter}` : '';
   let css =
     pageCss(p) +
-    '.mobilebar,.side,.hero{display:none!important}.shell{display:block!important}' +
-    'main{padding:18px 16px 96px!important}html{scroll-padding-top:12px!important;-webkit-text-size-adjust:100%}' +
+    // Sommaires et en-têtes des pages (MTI881 : .side/.hero ; MGL805 : .mast/nav.toc) : l'app a les siens.
+    '.mobilebar,.side,.hero,.mast,nav.toc,footer{display:none!important}.shell{display:block!important}' +
+    'main{padding:18px 16px 96px!important}.wrap{padding-top:18px!important;padding-bottom:96px!important}.wrap:has(>.mast){display:none!important}html{scroll-padding-top:12px!important;-webkit-text-size-adjust:100%}' +
     `body{font-size:${Math.round(16 * (o.fontScale ?? 1))}px!important}` +
     'mark.rv-find{background:var(--reward-soft);color:inherit;border-radius:3px;outline:2px solid var(--reward)}';
   if (o.mode !== 'all' && ch) {
-    css += `section.course{display:none!important}section.course${ch}{display:block!important;padding-top:0!important}`;
+    css += `section.course{display:none!important}section.course${ch}{display:block!important;padding-top:0!important;border-top:0!important}`;
   }
   if (o.mode === 'recap' && ch) {
     css += `section${ch}>*:not(aside.recap){display:none!important}section${ch}>aside.recap{margin-top:0!important}`;
@@ -68,12 +69,13 @@ export const PAGE_AFTER = `(function(){
 window.__rvApply&&window.__rvApply();
 var o=window.__RV||{};var post=function(m){window.ReactNativeWebView&&window.ReactNativeWebView.postMessage(JSON.stringify(m));};
 var sec=o.chapter?document.getElementById(o.chapter):null;
-if(o.mode==='examples'&&sec){
+if((o.mode==='examples'||o.mode==='traps')&&sec){
   var kids=[].slice.call(sec.children),lastH=null,count=0;
+  var keep=o.mode==='traps'?'.trap':'.box.ex, details.sol, .widget';
   kids.forEach(function(k){k.style.display='none';});
   kids.forEach(function(k){
     if(k.tagName==='H3'){lastH=k;return;}
-    if(k.matches('.box.ex, details.sol, .widget')){k.style.display='';count++;if(lastH){lastH.style.display='';}}
+    if(k.matches(keep)){k.style.display='';count++;if(lastH){lastH.style.display='';}}
   });
   post({type:'examples',count:count});
 }

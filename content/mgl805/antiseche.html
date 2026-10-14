@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=830">
+<title>Antisèche MGL805</title>
+<style>
+  @page { size: A4 portrait; margin: 7mm; }
+  :root { --ink: #111; --acc: #3d4bc0; --warn: #b3121f; --line: #c9cde0; --soft: #eef0fa; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--ink); }
+  body { font: 7.3pt/1.22 "Helvetica Neue", Arial, sans-serif; }
+  .sheet { width: 196mm; min-height: 283mm; margin: 0 auto; padding: 0; page-break-after: always; break-after: page; }
+  .sheet:last-child { page-break-after: auto; break-after: auto; }
+  header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1.5px solid var(--ink); padding-bottom: 1mm; margin-bottom: 1.5mm; }
+  header b { font-size: 10pt; letter-spacing: .02em; }
+  header span { font-size: 7pt; color: #555; }
+  .cols { column-count: 3; column-gap: 3mm; column-rule: .5px solid var(--line); }
+  section { break-inside: avoid-column; margin-bottom: 1.5mm; }
+  h2 { font-size: 8.8pt; margin: 0 0 .5mm; padding: .4mm 1.2mm; background: var(--acc); color: #fff; border-radius: 1mm; }
+  h2 .s { float: right; color: #ffd84d; }
+  h3 { font-size: 8.1pt; margin: .9mm 0 .2mm; color: var(--acc); }
+  p, ul { margin: .3mm 0; }
+  ul { padding-left: 3mm; }
+  li { margin: .1mm 0; }
+  .warn { color: var(--warn); }
+  .box { background: var(--soft); border-radius: 1mm; padding: .5mm 1.2mm; margin: .5mm 0; }
+  code { font: 6.8pt/1.15 Menlo, Consolas, monospace; }
+  table { border-collapse: collapse; width: 100%; font-size: 6.9pt; margin: .3mm 0; }
+  td, th { border: .5px solid var(--line); padding: .15mm .7mm; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  td.c { text-align: center; }
+  @media screen {
+    html { background: #d9dce6; }
+    .sheet { background: #fff; padding: 7mm; margin: 4mm auto; box-shadow: 0 1px 5px rgba(0,0,0,.2); width: 210mm; min-height: 297mm; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================= RECTO ========================= -->
+<div class="sheet">
+<header><b>MGL805 · Assurance qualité logicielle · Antisèche</b><span>Recto · IA, exigences, sécurité IAG, normes · ★ = signalé par le prof</span></header>
+<div class="cols">
+
+<section>
+<h2>25·1 · IA publique ou privée</h2>
+<ul>
+<li><b>Shadow AI</b> : 41 % des employés (LayerX) ; +~670 000 $ par violation (IBM).</li>
+<li><b>Loi 25</b> : téléverser des renseignements = <b>communication</b> (CAI) · <b>art. 17</b> : transfert hors Québec → protection équivalente · <b>EFVP</b> obligatoire avant tout projet d'IA · sanctions 25 M$ ou 4 % du CA mondial. <b>CLOUD Act</b> : fournisseurs US accessibles au gouv. US.</li>
+<li><b>Spectre</b> : 1 grand public (proscrire) → 2 entreprise (non-entraînement contractuel) → 3 souverain (sol québécois) → 4 privé auto-hébergé.</li>
+<li><b>Open source</b> = poids + code + recettes (reproductible) ⊃ <b>paramètres ouverts</b> = poids seuls. Licences permissives : Apache 2.0, MIT ; « communautaire » (Llama) = restrictions.</li>
+<li>70 B en FP16 = 70×10⁹ × 2 o = <b>140 Go</b> VRAM (8 bits ~70, 4 bits ~35).</li>
+<li>Privé : + souveraineté, contrôle, écart ~6-9 mois ; − infra, API moins chère à <b>faible volume</b>.</li>
+<li><b>RAG</b> : embeddings, index vectoriel, <b>reranker</b>, générateur ; sans réentraînement. <b>Fine-tuning</b> seulement si le RAG ne suffit pas.</li>
+<li>Cadrer (EFVP) · choisir (licence d'abord) · déployer (Ollama, vLLM) · encadrer (DLP, journaux).</li>
+<li class="box">Reco : <b>modèle hybride</b> ; le choix dépend de la <b>sensibilité des données</b>.</li>
+</ul>
+</section>
+
+<section>
+<h2>25·2 · Exigences qualité</h2>
+<ul>
+<li><b>EF</b> : ce que le produit doit accomplir. <b>ENF</b> : comment (= contraintes de conception). Sources : RFP, SOW, CONOPS, spéc. système.</li>
+<li><b>Modèle de qualité</b> : caractéristiques + relations pour <b>spécifier</b> et <b>évaluer</b> (donc mesurer).</li>
+<li>Interne vs externe (maintenabilité) : <b>testabilité</b> = nb de chemins du graphe de contrôle, sans exécution ; <b>analysabilité</b> = effort pour trouver la cause d'une défaillance, en exécution.</li>
+<li><b>IEEE 1061</b> (1998) : cadre de mesure, exemples sans prescrire. Qualité → facteurs → sous-facteurs → mesures.</li>
+<li class="box"><b>A = dispo / (dispo + non dispo)</b> · 37,5/(37,5+2) = 94,9 % &lt; 95 %. Panne max = fenêtre × (1 − cible) : 168 h × 0,5 % = 0,84 h.</li>
+<li><b>SQuaRE</b> = Quality Requirements and <b>Evaluation</b> (ISO 25000 ; relève d'ISO 9126 de 1991, peu utilisée). Divisions : 2500n gestion · 2501n modèle (25010) · 2502n mesure · 2503n exigences · 2504n évaluation. Étapes : exigences → modèle → mesures → évaluations.</li>
+<li>3 modèles : <b>de fonctionnement</b> (in use) · <b>du produit</b> · <b>des données</b>.</li>
+<li><b>In use</b> : efficacité · efficience · satisfaction · mitigation des risques · couverture contextuelle. <span class="warn">Efficacité = atteindre le but ; efficience = avec peu de ressources.</span></li>
+</ul>
+<table>
+<tr><th>8 caract. (A·E·C·F·F·S·M·P)</th><th>Sous-caractéristiques</th></tr>
+<tr><td>Aptitude fonctionnelle</td><td>exhaustivité, exactitude, pertinence</td></tr>
+<tr><td>Efficacité du rendement</td><td>temps, ressources</td></tr>
+<tr><td>Compatibilité</td><td>coexistence, interopérabilité</td></tr>
+<tr><td>Facilité d'utilisation</td><td>pertinence, apprentissage, opérabilité, protection, esthétique, accessibilité</td></tr>
+<tr><td>Fiabilité</td><td>maturité, disponibilité, <b>tolérance aux pannes</b>, rétablissement</td></tr>
+<tr><td>Sécurité</td><td>confidentialité, intégrité, <b>non-réfutation</b>, responsabilisation, authenticité</td></tr>
+<tr><td>Maintenabilité</td><td>modularité, réutilisabilité, analysabilité, modifiabilité, testabilité</td></tr>
+<tr><td>Portabilité</td><td>adaptabilité, installabilité, remplaçabilité</td></tr>
+</table>
+<ul>
+<li><b>Tab. 3.6</b> : + fonctionnalités → − efficacité, fiabilité, sécurité, maintenabilité · sécurité → − rendement, utilisabilité · rendement nuit à presque tout · maintenabilité → + fiabilité, sécurité.</li>
+<li><b>Fig. 3.8</b> : parties prenantes → questionnaire → entrevues → consolider/prioriser → faire autoriser.</li>
+</ul>
+</section>
+
+<section>
+<h2>25·3 · Sécurité des artéfacts IAG</h2>
+<ul>
+<li>4 surfaces : <b>A</b> ce que le modèle écrit · <b>B</b> ce qu'il lit · <b>C</b> ce que l'outil fait · <b>D</b> ce que l'humain ne fait plus. <span class="warn">La revue humaine ne corrige ni B ni D.</span></li>
+<li>Code généré : compile ~100 %, <b>~44 %</b> vulnérable (réussite 56 %, stagnation). Perry : moins sûr, mais on se croit plus en sécurité.</li>
+<li><b>Nouveaux : 2, 3, 5, 6</b> (paquet halluciné, injection par le dépôt, agents sur-privilégiés, outillage IA/MCP). Amplifiés : 1, 4, 7, 8, 9, 10. <b>Nº 9</b> écart de vérification = <b>multiplicateur</b>. <span class="warn">Ne pas négliger nº 7 (contrôle d'accès, 1er OWASP).</span></li>
+<li>Injection : Unicode invisible dans CLAUDE.md, .cursorrules → refuser les non-imprimables en IC. Agents : contrôle <b>hors de l'agent</b> (bac à sable, moindre privilège). <b>AIBOM</b> : agents, outils, serveurs MCP.</li>
+<li class="box">Un contrôle qui repose sur la vigilance = une <b>recommandation</b>. Chaque contrôle doit être <b>mécanique</b>.</li>
+<li><b>Slopsquatting</b> : 19,7 % des paquets suggérés n'existent pas ; faux nom reproductible → l'attaquant le publie ; hook PostInstall avant le 1er import.</li>
+<li>Contre-mesures : <b>miroir + quarantaine</b> &gt; verrouillage &gt; SCA en porte d'IC &gt; installation sans exécution &gt; règle de revue.</li>
+<li>6 politiques de quarantaine : âge (7-30 j) · vulnérabilités · réputation · licence · comportement · provenance. Le halluciné échoue à âge, réputation, comportement. Limite : <code>--index-url</code> contourne → bloquer au pare-feu.</li>
+<li><code>==2.32.3</code> = reproductibilité (qualité) ; <code>--hash</code> = intégrité (sécurité). <code>pip install --require-hashes</code> · runner : <code>npm ci</code> (+ <code>--ignore-scripts</code>). Le verrou fige aussi le mal.</li>
+<li>SCA : <b>A</b> CVE (inutile contre un nom halluciné) · <b>B</b> paquets malveillants (après installation). Meilleurs : deptry, quarantaine, vérif. d'existence sur le SBOM.</li>
+<li>Python <code>only-binary = :all:</code> · npm ignore-scripts · Maven : JAR inerte, plugins exécutés. Charge → <code>__init__.py</code> : réduction, pas prévention.</li>
+</ul>
+</section>
+
+<section>
+<h2>25·4 · Normes et modèles <span class="s">★</span></h2>
+<ul>
+<li class="box">★ Combien de normes en GL ? <b>entre 120 et 300</b> (SC7 : 5 → &gt;160 en 2016).</li>
+<li>Norme = exigences obligatoires par <b>consensus</b> (≠ unanimité). Usage ISO <b>volontaire</b>. Adoption IS : <b>2/3</b> des pays participants. Coût de <b>prévention</b>.</li>
+<li>ISO + IEC → <b>JTC 1 / SC 7</b> (WG 24 : ISO 29110 TPE ; WG 20 : SWEBOK). SC 27 sécurité.</li>
+<li>★ <b>SWEBOK v4</b> : corpus de ce que l'ingénieur logiciel doit maîtriser, 17 domaines (nouveaux : architecture, opérations, sécurité). Disciplines connexes (génie info, informatique, gestion de projet, génie des systèmes…) : il ne fait que <b>délimiter la frontière</b> et renvoie à leurs corpus.</li>
+<li>★ <b>PMBOK</b> (PMI) : gestion de projet. 5 groupes : démarrage · planification · exécution · surveillance et maîtrise · clôture. <b>12 principes</b> : intendance, équipe, parties prenantes, valeur, pensée systémique, leadership, adaptation, qualité, complexité, risque, adaptabilité/résilience, changement.</li>
+<li>★ <b>BABOK</b> (IIBA) : analyste d'affaires — planifier/suivre les exigences, élicitation, cycle de vie des exigences, analyse stratégique, analyser/concevoir, évaluer les solutions.</li>
+<li>★ <b>ISO 12207</b> : la plus importante après le SWEBOK ; OIQ. <b>shall</b> = obligé · should = devriez · could = pouvez. 30 processus : contractuels 2 · organisationnels 6 · de gestion 8 · techniques 14. Adaptation : énoncé <b>full / tailored</b>, justifier les omissions, autorisation qualité.</li>
+<li><b>ISO 9001:2015</b>, 7 principes : client · leadership · implication · approche processus · amélioration continue · preuves · fournisseurs. <b>90003</b> = ISO 9001 appliquée au logiciel.</li>
+<li>ITIL (ISO 20000) · <b>27001</b> = SMSI · COBIT (ISACA, auditeurs) : EDM + APO/BAI/DSS/MEA.</li>
+<li>DO-178C A→E : A catastrophique 10⁻⁹/h · EN 50716 : formel aussi SIL 1-2 · ISO 13485 médical.</li>
+</ul>
+</section>
+
+</div>
+</div>
+
+<!-- ========================= VERSO ========================= -->
+<div class="sheet">
+<header><b>MGL805 · Antisèche</b><span>Verso · GCL, processus, risque, plan qualité, fournisseurs, CMMI</span></header>
+<div class="cols">
+
+<section>
+<h2>26·1 · Gestion de la configuration <span class="s">★</span></h2>
+<ul>
+<li>GC = identifier/documenter les caractéristiques, <b>contrôler</b> les changements, enregistrer l'état, vérifier la conformité. Exigences : <b>1 à 3 %</b> de changement par mois.</li>
+</ul>
+<table>
+<tr><th>★ 6 activités clés (SWEBOK)</th></tr>
+<tr><td>1 Management et planification (PGCL)</td></tr>
+<tr><td>2 Identification de la configuration</td></tr>
+<tr><td>3 Contrôle des changements</td></tr>
+<tr><td>4 Comptabilité du statut (état)</td></tr>
+<tr><td>5 Audit (complétude physique et fonctionnelle)</td></tr>
+<tr><td>6 Gestion des versions et livraison</td></tr>
+</table>
+<ul>
+<li>Plan de GCL approuvé au plus tard à la <b>fin de la spécification</b>.</li>
+<li><b>ÉCL</b> : identifiable de façon univoque (même le <b>compilateur</b>). ID = fixe + variable : <code>C001-Rad-Aff-DA-01-02</code> (v1, rév. 2).</li>
+<li><b>Référentiel</b> : ÉCL figés ; ne change que par le contrôle des changements. Bibliothèques : privée · projet · publique.</li>
+</ul>
+<table>
+<tr><th>★ Branches</th><th>Équipe</th><th>Contexte</th></tr>
+<tr><td><b>Simple</b></td><td>2-3 ensemble</td><td>un projet, livraisons simples</td></tr>
+<tr><td>Typique</td><td>4 +</td><td>plusieurs versions</td></tr>
+<tr><td>Avancée</td><td>5 +</td><td>hotfix, paquets de services</td></tr>
+<tr><td>Fonctionnelle</td><td>5 +</td><td>par fonction</td></tr>
+</table>
+<p class="box">★ Simple : <b>isoler</b> le dev de la branche principale stable, <b>figer</b> chaque version livrée (1.0.1), fusionner ; la moins coûteuse.</p>
+<ul>
+<li>★ Demande de changement (Wiegers) : <b>soumise → évaluée</b> (analyse d'impact) <b>→ approuvée</b> (CCC) <b>→ modifiée → vérifiée → fermée → archivée</b> ; ou évaluée → rejetée → archivée.</li>
+<li><b>CCC/CCB</b> : prioriser, décider, ordres de modif., répondre, droits d'accès, compte rendu.</li>
+<li><b>ACF</b> : fonctionnalité conforme aux spéc. · <b>ACP</b> : « tel que construit » traçable, prêt à livrer.</li>
+<li>Inspection : planification · survol · préparation · réunion · reprise · suivi.</li>
+</ul>
+</section>
+
+<section>
+<h2>26·2 · Politiques, processus, procédures <span class="s">★</span></h2>
+<table>
+<tr><th>Pyramide</th><th>Répond à</th></tr>
+<tr><td>Politiques</td><td>Pourquoi</td></tr>
+<tr><td>Processus</td><td>Quoi, qui, quand</td></tr>
+<tr><td>Procédures</td><td>Comment, avec quoi</td></tr>
+<tr><td>Enregistrements</td><td>Preuves</td></tr>
+</table>
+<ul>
+<li>★ <b>Politique</b> (ISO 38500) : énoncés clairs et <b>mesurables</b> de la direction pour orienter les décisions. Rédigée par la <b>direction</b> (pas les praticiens) ; change rarement ; approuvée au début ou vers la fin. La direction : communique, suit, exige des arguments pour toute déviation, budgète, forme.</li>
+<li>★ <b>Processus</b> (SEI) : personnes + procédures/méthodes + outils intégrés pour produire le résultat. <b>Description de processus</b> : activités documentées, complète, précise, vérifiable. <b>Procédure</b> : manière spécifiée / série ordonnée d'étapes. <b>Propriétaire</b> : définit et maintient ; approuve l'adaptation.</li>
+<li>ISO 24774 : titre · intention · résultats · activités · tâches. <b>Gabarit</b> : atout à espaces libres.</li>
+<li>Pièges : shelfware, papier, tout texte, consultant externe, mélanger politique et processus.</li>
+</ul>
+<table>
+<tr><th>★ Qualigram</th><th>Montre</th><th>Rôles</th><th>Question</th></tr>
+<tr><td>1 Stratégique</td><td>processus (noms)</td><td>aucun</td><td>pour quoi ?</td></tr>
+<tr><td>2 Organisationnel</td><td>procédures (verbes)</td><td>plusieurs</td><td>qui fait quoi ?</td></tr>
+<tr><td>3 Opérationnel</td><td>instructions</td><td>un seul</td><td>comment, avec quoi ?</td></tr>
+</table>
+<p>+ référentiel unique, hiérarchique (zoom), contrôles, intranet, gabarits. <b>Visio/LucidChart</b> : dessins isolés, sans liens, versions ni approbations → incohérents à grande échelle. BPMN : automatisation, mais complexe.</p>
+</section>
+
+<section>
+<h2>26·5 · Gestion du risque <span class="s">★</span></h2>
+<ul>
+<li>Risque = probabilité × conséquence (ISO 16085) ; positif ou négatif (PMBoK). Très élevé = opportunité → <b>comité de direction</b>, jamais seul.</li>
+<li>Reprises = <b>40-50 %</b> du coût de développement.</li>
+<li>★ Étapes (PMI) : identification · analyse qualitative · analyse quantitative et réponse · surveillance. Boehm : évaluation (identifier, analyser, prioriser) + contrôle (planifier, résoudre, surveiller) + leçons.</li>
+<li>★ 4 types : <b>techniques · de gestion · contractuels/juridiques · liés au personnel</b>.</li>
+<li>Énoncé : <b>condition + conséquence</b>. Identifier : entrevues, FFOM, Ishikawa, listes.</li>
+<li>Probabilité 6.10 : 1 peu probable · 2 faible · 3 probable · 4 très probable · 5 presque sûr. Conséquence 6.8 : 5 = jalons impossibles / budget +&gt;15 %.</li>
+</ul>
+<table>
+<tr><th>6.9</th><th>C1</th><th>C2</th><th>C3</th><th>C4</th><th>C5</th></tr>
+<tr><td>P5</td><td>F</td><td>M</td><td>É</td><td>É</td><td>É</td></tr>
+<tr><td>P4</td><td>F</td><td>M</td><td>M</td><td>É</td><td>É</td></tr>
+<tr><td>P3</td><td>F</td><td>F</td><td>M</td><td>M</td><td>É</td></tr>
+<tr><td>P2</td><td>F</td><td>F</td><td>F</td><td>M</td><td>M</td></tr>
+<tr><td>P1</td><td>F</td><td>F</td><td>F</td><td>F</td><td>M</td></tr>
+</table>
+<p class="box">★ <b>VMA = Σ P × $</b> ; menace −, opportunité +. Ex. : −0,25×80k + 0,10×100k − 0,05×150k = <b>−17 500 $</b>. Rentabilité d'une action : baisse de perte attendue − coût.</p>
+<ul>
+<li>Résolution : <b>évitement</b> (ne pas faire) · <b>confinement</b> (réserves) · <b>atténuation</b> (réduire l'impact) ; + transfert, acceptation, contingence.</li>
+<li>Formulaire Wiegers : ID, condition-conséquence, P, perte, exposition, déclencheur, atténuation, propriétaire, échéance.</li>
+</ul>
+</section>
+
+<section>
+<h2>16·1 · Plan qualité (IEEE 730) <span class="s">★</span></h2>
+<ul>
+<li>Plan qualité = <b>revue du plan de projet</b> par l'AQL ; synthèse du cours.</li>
+<li>★ <b>Maison de l'AQL</b> : base = déontologie, support de la direction, groupe d'AQL · fondations = référentiels (normes, modèles, catégories d'erreurs, terminologie) · infrastructure (GC, revues, audits, V&amp;V, tests, politiques, procédures, mesures) · culture (coût de la qualité, déontologie, modèle et exigences qualité, fournisseurs, contrats, risque) · <b>poutre = plan d'AQL</b> · piliers = processus clairs, formation constante, amélioration continue · toit = livraison de qualité, employés heureux.</li>
+<li>★ But : preuves d'une <b>confiance justifiée</b> que le logiciel est conforme ; exigences minimales d'AQL. 1979 → 2014 (processus, harmonisée 12207).</li>
+<li>Clauses : 1 aperçu · 2-3 réf., définitions · <b>4 concepts</b> (4.1 direction … 4.8 SMQ) · <b>5 processus</b> (5.3 mise en œuvre, 5.4 produit, 5.5 processus) · annexes A-J (C guide du plan, F agile, G 29110).</li>
+<li>★ Plan type : 1 but · 2 définitions · 3 références · 4 vue d'ensemble (organisation/indépendance, risque, outils, normes, effort) · 5 activités (produit, processus) · 6 considérations (contrat, mesure, dérogations, répétition, risques, communication, non-conformité) · 7 enregistrements. <span class="warn">Sujets normatifs, noms/ordre informatifs ; section non applicable = emplacement + justification.</span></li>
+<li><b>16 activités</b> : 5.3 (6) dont 5.3.6 indépendance et <b>objectivité</b> · 5.4 produit (5) · 5.5 processus (5) dont 5.5.4 sous-traitants, 5.5.6 compétences.</li>
+<li>Direction : connaît l'AQL · fournit des ressources · reçoit l'info et agit. L'AQL d'un artéfact ≠ son auteur.</li>
+<li><b>IDEAL</b> : Démarrage · Diagnostic · Instauration · Action · Apprentissage.</li>
+<li><b>IEEE 1012</b> : intégrité 1-4 (<b>4 = le plus élevé</b>). IV&amp;V : technique · managériale · financière.</li>
+<li>Note doc. : gabarit sinon 0 ; O=1, L=0,5, S=0 × poids (contenu .2/.2/.1/.1, structure .1/.1, gestion .1/.1). &lt;60 refusé · &lt;75 à améliorer · &gt;85 accepté. <span class="warn">Diapo : 65 → vrai 55.</span></li>
+<li>Défauts : 1 bloquant · 2 important · 3 sans problème majeur · 4 mineur. <b>Coût de reprise</b> = itération sur une tâche avec défaut.</li>
+</ul>
+</section>
+
+<section>
+<h2>16·2 · Fournisseurs et contrats</h2>
+<ul>
+<li>CMMI SAM (niv. 2 V1.3) : SG1 établir (type, choix, accord) · SG2 respecter (exécuter, accepter, transférer). Énoncé des travaux = <b>SOW</b>.</li>
+<li>Participants externes : sous-traitants · progiciels · ressources du client. Risques : délais, livrables, <b>transition</b> (mainteneurs peuvent refuser).</li>
+<li>ISO 12207 acquisition : préparation · demande · sélection · contrat · suivi · acceptation.</li>
+</ul>
+<table>
+<tr><th>Contrat</th><th>Risque de dépassement</th></tr>
+<tr><td>Régie + % du coût</td><td>client</td></tr>
+<tr><td>Régie + honoraire fixe</td><td>client</td></tr>
+<tr><td>Régie / prix fixe + intéressement</td><td>partagé</td></tr>
+<tr><td>Prix fixe</td><td><b>fournisseur</b></td></tr>
+</table>
+<p class="box">Prix fixe + intéressement : jour = prix ÷ jours (6 450 000/249 = 25 903,61 $). Part fourn. y = 1,1245x − 250 ; à 270 j ≈ 54 %. Risque max client ≈ milieu de la plage.</p>
+<ul>
+<li>Revue initiale (besoins, options, risque, ressources) · finale (avant signature : aucun changement non convenu).</li>
+<li><span class="warn">Bon contrat = le <b>vôtre</b>, pas celui de l'intégrateur.</span> Grille : poids fixés avant l'ouverture, total pondéré.</li>
+</ul>
+</section>
+
+<section>
+<h2>CMMI</h2>
+<table>
+<tr><th>Niv.</th><th>Nom</th><th>Focus</th></tr>
+<tr><td class="c">1</td><td>Initial</td><td>—</td></tr>
+<tr><td class="c">2</td><td>Discipliné</td><td>gestion de projet</td></tr>
+<tr><td class="c">3</td><td>Ajusté</td><td>capitalisation, personnalisation</td></tr>
+<tr><td class="c">4</td><td>Géré quantitativement</td><td>gestion quantitative</td></tr>
+<tr><td class="c">5</td><td>En optimisation</td><td>optimisation continue</td></tr>
+</table>
+<ul>
+<li>V1.3 niv. 2 : exigences, planif., suivi, <b>accords fournisseurs</b>, mesure, <b>AQ processus/produit</b>, <b>GC</b>. Niv. 3 : risques, V&amp;V, DAR…</li>
+<li><b>V2.0</b> : domaines de pratiques → capability areas → 4 catégories (Doing, Managing, Enabling, Improving). <b>CM</b> = Supporting Implementation (Enabling), niv. 1-2. <b>RSK</b> = Risk <i>and Opportunity</i>. GOV : la direction fixe les politiques.</li>
+<li>Montée de niveau : − risque, − reprise ; + qualité, + productivité.</li>
+<li>Capacité d'un processus (Grant) : ne s'achète pas, se bâtit sur des années, pas en accumulant des gabarits ; s'impartit difficilement.</li>
+</ul>
+</section>
+
+</div>
+</div>
+
+</body>
+</html>

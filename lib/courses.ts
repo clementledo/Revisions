@@ -1,5 +1,7 @@
-import { cards as mti881Cards } from '@/content/mti881/cartes';
+import { chapters as mgl805Chapters, questions as mgl805Questions } from '@/content/generated/mgl805';
 import { chapters as mti881Chapters, questions as mti881Questions } from '@/content/generated/mti881';
+import { cards as mgl805Cards } from '@/content/mgl805/cartes';
+import { cards as mti881Cards } from '@/content/mti881/cartes';
 import type { Course, Question } from '@/lib/types';
 
 // Le quiz de la page MTI881 regroupe Gymnasium et PyTorch sous « cours 2 » : on range chaque question
@@ -27,13 +29,28 @@ export const COURSES: Course[] = [
     id: 'mgl805',
     code: 'MGL805',
     title: 'Qualité logicielle',
-    subtitle: 'Contenu à venir',
+    subtitle: 'Examen final · 17 octobre',
     color: '#4c5bd4',
-    chapters: [],
-    lessons: [],
+    page: require('@/assets/pages/mgl805.html'),
+    antiseche: require('@/assets/pages/mgl805-antiseche.html'),
+    chapters: mgl805Chapters,
+    lessons: mgl805Chapters.map((c) => c.id),
+    // Chaque question porte déjà sa partie (content/mgl805/quiz-chapitres.json).
     quizChapters: {},
-    questions: [],
-    cards: [],
+    questions: mgl805Questions,
+    cards: mgl805Cards,
+    slideKeys: [
+      ['iapriv', /ia.?publi|ia.?priv/],
+      ['exig', /exigence/],
+      ['iag', /(^|[^a-z])iag([^a-z]|$)|artefact/],
+      ['cmmi', /cmmi/],
+      ['gcl', /configuration|gcl/],
+      ['ppp', /politique|processus|procedure/],
+      ['risque', /risque/],
+      ['plan', /plan.?(aql|qualit)|ieee.?(730|1012)|1012/],
+      ['fourn', /fournisseur|contrat/],
+      ['normes', /norme/],
+    ],
   },
   {
     id: 'mti825',

@@ -5,19 +5,27 @@ export type Chapter = {
   lede: string;
   sections: { title: string; index: number }[];
   examples: number;
+  /** Encadrés « Piège d'examen » de la partie. */
+  traps: number;
+  /** Partie signalée par le prof (★). */
+  hot: boolean;
   widgets: { id: string; title: string }[];
   hasRecap: boolean;
   text: string;
 };
 
-/** Question du quiz : qcm (choix), vf (vrai/faux), num (calcul), ex (exercice auto-corrigé). */
+/** Question du quiz : qcm (choix), vf (vrai/faux), num (calcul), fill (texte à trous), ex (exercice auto-corrigé). */
 export type Question = {
   c: number;
-  t: 'qcm' | 'vf' | 'num' | 'ex';
+  t: 'qcm' | 'vf' | 'num' | 'fill' | 'ex';
+  /** Numéro dans la page (A1, B3…). */
+  n?: string;
   q: string;
   o?: string[];
   a?: number | boolean;
   tol?: number;
+  /** Réponses acceptées d'un texte à trous. */
+  acc?: string[];
   e: string;
   /** Chapitre (id dans la page), ajouté au chargement du cours. */
   ch?: string;
@@ -41,4 +49,6 @@ export type Course = {
   quizChapters: Record<number, string[]>;
   questions: Question[];
   cards: Card[];
+  /** Mots du nom de fichier qui désignent une partie (nom sans accents, en minuscules), testés dans l'ordre. */
+  slideKeys?: [string, RegExp][];
 };

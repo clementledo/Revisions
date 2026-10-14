@@ -9,7 +9,7 @@ import { useStored } from '@/lib/store';
 import { markRead, readKey, type ReadMap } from '@/lib/study';
 import { useTheme } from '@/lib/theme';
 
-const TITLES: Record<string, string> = { recap: 'Récap', examples: 'Exemples' };
+const TITLES: Record<string, string> = { recap: 'Récap', examples: 'Exemples', traps: 'Pièges d’examen' };
 
 export default function Read() {
   const { id, ch, mode = 'chapter', anchor, find } = useLocalSearchParams<{ id: string; ch: string; mode?: PageMode; anchor?: string; find?: string }>();

@@ -25,7 +25,10 @@ export default function ChapterScreen() {
   return (
     <Screen>
       <Stack.Screen options={{ title: chapter.eyebrow }} />
-      <Text style={[s.eyebrow, { color: c }]}>{chapter.eyebrow}</Text>
+      <Text style={[s.eyebrow, { color: c }]}>
+        {chapter.eyebrow}
+        {chapter.hot && <Text style={{ color: p.bad }}>{'  ★ Signalé par le prof'}</Text>}
+      </Text>
       <Text style={s.title}>{chapter.title}</Text>
       {!!chapter.lede && <Text style={s.lede}>{chapter.lede}</Text>}
 
@@ -60,6 +63,15 @@ export default function ChapterScreen() {
             title="Exemples et exercices du cours"
             sub={`${chapter.examples} exemples détaillés`}
             onPress={() => router.push(`${base}/lire?ch=${ch}&mode=examples`)}
+          />
+        )}
+        {chapter.traps > 0 && (
+          <Row
+            icon="alert-outline"
+            color={c}
+            title="Pièges d’examen"
+            sub={`${chapter.traps} encadré${chapter.traps > 1 ? 's' : ''} à connaître`}
+            onPress={() => router.push(`${base}/lire?ch=${ch}&mode=traps`)}
           />
         )}
         {chapter.widgets.map((w) => (

@@ -90,12 +90,27 @@ export function recordAnswer(course: string, qIndex: number, ok: boolean) {
   logActivity();
 }
 
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9|+\-–—\s.]/g, '')
+    .replace(/[–—]/g, '-')
+    .replace(/\s+/g, ' ');
+
 export function checkAnswer(q: Question, value: number | boolean | string) {
   if (q.t === 'qcm') return value === q.a;
   if (q.t === 'vf') return value === q.a;
   if (q.t === 'num') {
     const n = Number(String(value).replace(',', '.').replace(/\s/g, ''));
     return Number.isFinite(n) && Math.abs(n - Number(q.a)) <= (q.tol ?? 0.005) + 1e-9;
+  }
+  if (q.t === 'fill') {
+    // Même tolérance que la page : sans accents ni ponctuation, la réponse peut contenir le mot attendu.
+    const v = norm(String(value));
+    return !!v && (q.acc ?? []).map(norm).some((a) => v === a || (a.length > 3 && v.includes(a)));
   }
   return false;
 }

@@ -37,16 +37,20 @@ export default function CourseScreen() {
 
   const stats = chapterStats(course);
   const due = dueCards(course).length;
-  const tools: { icon: IconName; label: string; sub: string; go: string }[] = [
+  const has = (f: (c: (typeof course.chapters)[number]) => unknown) => course.chapters.some(f);
+  const exercises = course.questions.filter((q) => q.t === 'ex').length;
+  type Tool = { icon: IconName; label: string; sub: string; go: string; show?: unknown };
+  const tools = ([
     { icon: 'cards-outline', label: 'Cartes', sub: due ? `${due} à revoir` : 'À jour', go: `/cartes?course=${id}` },
-    { icon: 'format-list-checks', label: 'QCM', sub: `${course.questions.filter((q) => q.t !== 'ex').length} questions`, go: `${base}/quiz` },
-    { icon: 'pencil-box-outline', label: 'Exercices', sub: 'Avec correction', go: `${base}/exercices` },
-    { icon: 'star-four-points-outline', label: 'Récaps', sub: 'À retenir, pièges', go: `${base}/liste?kind=recap` },
-    { icon: 'calculator-variant-outline', label: 'Calculateurs', sub: 'Interactifs', go: `${base}/liste?kind=calc` },
-    { icon: 'sigma', label: 'Aide-mémoire', sub: 'Toutes les formules', go: `${base}/lire?ch=formules` },
-    { icon: 'file-document-outline', label: 'Antisèche', sub: 'Recto verso', go: `${base}/antiseche` },
+    { icon: 'format-list-checks', label: 'QCM', sub: `${course.questions.length - exercises} questions`, go: `${base}/quiz` },
+    { icon: 'pencil-box-outline', label: 'Exercices', sub: 'Avec correction', go: `${base}/exercices`, show: exercises || has((c) => c.examples) },
+    { icon: 'star-four-points-outline', label: 'Récaps', sub: 'À retenir, pièges', go: `${base}/liste?kind=recap`, show: has((c) => c.hasRecap) },
+    { icon: 'alert-outline', label: 'Pièges d’examen', sub: 'Ce qui fait perdre des points', go: `${base}/liste?kind=traps`, show: has((c) => c.traps) },
+    { icon: 'calculator-variant-outline', label: 'Calculateurs', sub: 'Interactifs', go: `${base}/liste?kind=calc`, show: has((c) => c.widgets.length) },
+    { icon: 'sigma', label: 'Aide-mémoire', sub: 'Toutes les formules', go: `${base}/lire?ch=formules`, show: has((c) => c.id === 'formules') },
+    { icon: 'file-document-outline', label: 'Antisèche', sub: 'Recto verso', go: `${base}/antiseche`, show: course.antiseche },
     { icon: 'presentation', label: 'Slides', sub: slides ? `${slides} PDF` : 'À ajouter', go: `${base}/slides` },
-  ];
+  ] satisfies Tool[]).filter((t) => !('show' in t) || t.show);
 
   return (
     <Screen>
@@ -71,6 +75,7 @@ export default function CourseScreen() {
           <Card key={st.id} onPress={() => router.push(`${base}/chapitre?ch=${st.id}`)}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
               <Text style={[s.eyebrow, { color: course.color }]}>{ch.eyebrow}</Text>
+              {ch.hot && <Text style={[s.hot, { color: p.bad }]}>★ Signalé par le prof</Text>}
               <View style={{ flex: 1 }} />
               {st.read && <Icon name="check-circle" size={18} color={p.good} />}
             </View>
@@ -117,6 +122,7 @@ const useStyles = makeStyles((p) => ({
   toolLabel: { fontFamily: 'Inter', fontSize: 15.5, fontWeight: '700', color: p.text },
   toolSub: { fontFamily: 'Inter', fontSize: 12.5, color: p.muted },
   eyebrow: { fontFamily: 'Inter', fontSize: 12, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' },
+  hot: { fontFamily: 'Inter', fontSize: 11.5, fontWeight: '700' },
   chTitle: { fontFamily: 'Inter', fontSize: 17, fontWeight: '700', color: p.text, letterSpacing: -0.2 },
   level: { fontFamily: 'Inter', fontSize: 12.5, fontWeight: '700', color: p.muted, width: 40, textAlign: 'right' },
 }));

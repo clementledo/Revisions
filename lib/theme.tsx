@@ -93,7 +93,10 @@ export function makeStyles<T extends StyleSheet.NamedStyles<T>>(fn: (p: Palette)
 export function pageCss(p: Palette) {
   return `html:root[data-theme][data-theme]{--bg:${p.bg};--surface:${p.surface};--ink:${p.text};--muted:${p.muted};--line:${p.line};` +
     `--accent:${p.accent};--accent-soft:${p.accentSoft};--reward:${p.warn};--reward-soft:${p.warnSoft};` +
-    `--good:${p.good};--good-soft:${p.goodSoft};--bad:${p.bad};--bad-soft:${p.badSoft};color-scheme:${p.dark ? 'dark' : 'light'}}`;
+    `--good:${p.good};--good-soft:${p.goodSoft};--bad:${p.bad};--bad-soft:${p.badSoft};` +
+    // Noms utilisés par la page MGL805.
+    `--paper:${p.bg};--surface-2:${p.surface2};--ink-2:${p.text}d9;--rule:${p.line};--flag:${p.bad};--flag-soft:${p.badSoft};` +
+    `--ok:${p.good};--ok-soft:${p.goodSoft};color-scheme:${p.dark ? 'dark' : 'light'}}`;
 }
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
