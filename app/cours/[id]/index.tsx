@@ -171,7 +171,7 @@ export default function CourseScreen() {
 }
 
 const useStyles = makeStyles((p) => ({
-  hero: { borderRadius: radius.xl, overflow: 'hidden', padding: 20, gap: 16 },
+  hero: { borderRadius: radius.xl, overflow: 'hidden', padding: 20, gap: 16, backgroundColor: p.accent },
   heroIcon: { width: 42, height: 42, borderRadius: 13, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
   heroCode: { ...type.overline, fontSize: 13, color: 'rgba(255,255,255,0.9)' },
   badge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 99, paddingHorizontal: 10, paddingVertical: 5 },

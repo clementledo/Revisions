@@ -1,5 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Children, Fragment, isValidElement, type ComponentProps, type ReactNode } from 'react';
+import { Children, Fragment, isValidElement, useState, type ComponentProps, type ReactNode } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -348,20 +348,35 @@ export function RingLabel({ value, size = 13 }: { value: number; size?: number }
   return <Text style={[s.ringLabel, { fontSize: size }]}>{Math.round(Math.max(0, Math.min(1, value || 0)) * 100)}%</Text>;
 }
 
-/** Fond en dégradé diagonal (à placer en premier enfant d'une vue avec overflow: 'hidden'). */
+/**
+ * Fond en dégradé diagonal (à placer en premier enfant d'une vue avec overflow: 'hidden').
+ * Le SVG reçoit sa taille mesurée : sur Android, une taille en % le laisse plus petit que la carte.
+ */
 export function Gradient({ colors, id = 'g' }: { colors: [string, string]; id?: string }) {
+  const [size, setSize] = useState({ w: 0, h: 0 });
+  const { w, h } = size;
   return (
-    <Svg style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} width="100%" height="100%">
-      <Defs>
-        <LinearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor={colors[0]} />
-          <Stop offset="1" stopColor={colors[1]} />
-        </LinearGradient>
-      </Defs>
-      <Rect x="0" y="0" width="100%" height="100%" fill={`url(#${id})`} />
-      <Circle cx="92%" cy="-10%" r="38%" fill="#ffffff" fillOpacity={0.07} />
-      <Circle cx="105%" cy="70%" r="24%" fill="#ffffff" fillOpacity={0.05} />
-    </Svg>
+    <View
+      pointerEvents="none"
+      style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors[1] }}
+      onLayout={(e) => {
+        const { width, height } = e.nativeEvent.layout;
+        if (Math.round(width) !== w || Math.round(height) !== h) setSize({ w: Math.round(width), h: Math.round(height) });
+      }}>
+      {w > 0 && (
+        <Svg width={w} height={h}>
+          <Defs>
+            <LinearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0" stopColor={colors[0]} />
+              <Stop offset="1" stopColor={colors[1]} />
+            </LinearGradient>
+          </Defs>
+          <Rect x={0} y={0} width={w} height={h} fill={`url(#${id})`} />
+          <Circle cx={w * 0.92} cy={-h * 0.1} r={w * 0.38} fill="#ffffff" fillOpacity={0.07} />
+          <Circle cx={w * 1.05} cy={h * 0.7} r={w * 0.24} fill="#ffffff" fillOpacity={0.05} />
+        </Svg>
+      )}
+    </View>
   );
 }
 
