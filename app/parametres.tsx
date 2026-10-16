@@ -1,4 +1,4 @@
-import { Alert, Text, View } from 'react-native';
+import { Alert, Image, Text, View } from 'react-native';
 
 import { UpdateBanner } from '@/components/UpdateBanner';
 import { Group, Icon, Press, Row, Screen, Section, Segmented } from '@/components/ui';
@@ -77,9 +77,7 @@ export default function Settings() {
       </Section>
 
       <View style={s.about}>
-        <View style={[s.logo, { backgroundColor: p.accent }]}>
-          <Icon name="school-outline" size={22} color={p.onAccent} />
-        </View>
+        <Image source={require('@/assets/images/splash-icon.png')} style={s.logo} />
         <Text style={s.aboutTitle}>Révisions</Text>
         <Text style={s.hint}>Version {currentVersion()} · faite pour l’ETS</Text>
       </View>
@@ -143,6 +141,6 @@ const useStyles = makeStyles((p) => ({
   themeFoot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4, paddingBottom: 3, gap: 4 },
   themeName: { fontFamily: 'Inter', fontSize: 13, fontWeight: '700', color: p.text2, flexShrink: 1 },
   about: { alignItems: 'center', gap: 6, marginTop: space.lg },
-  logo: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  logo: { width: 52, height: 52 },
   aboutTitle: { ...type.headline, color: p.text },
 }));

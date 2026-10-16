@@ -24,7 +24,8 @@ module.exports = {
     android: {
       package: 'com.clementledo.revisions',
       adaptiveIcon: {
-        backgroundColor: '#0e6b63',
+        backgroundColor: '#3a47c9',
+        backgroundImage: './assets/images/android-icon-background.png',
         foregroundImage: './assets/images/android-icon-foreground.png',
         monochromeImage: './assets/images/android-icon-monochrome.png',
       },
