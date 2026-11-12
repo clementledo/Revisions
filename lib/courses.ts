@@ -1,6 +1,8 @@
 import { chapters as mgl805Chapters, questions as mgl805Questions } from '@/content/generated/mgl805';
+import { chapters as mti825Chapters, questions as mti825Questions } from '@/content/generated/mti825';
 import { chapters as mti881Chapters, questions as mti881Questions } from '@/content/generated/mti881';
 import { cards as mgl805Cards } from '@/content/mgl805/cartes';
+import { cards as mti825Cards } from '@/content/mti825/cartes';
 import { cards as mti881Cards } from '@/content/mti881/cartes';
 import type { Course, Question } from '@/lib/types';
 
@@ -59,14 +61,26 @@ export const COURSES: Course[] = [
     id: 'mti825',
     code: 'MTI825',
     title: 'Gestion des services TI',
-    subtitle: 'Contenu à venir',
+    subtitle: 'Séances 1 à 11 · A2026',
     color: '#c46a1a',
     icon: 'server-network',
-    chapters: [],
-    lessons: [],
+    exam: '2026-12-02',
+    page: require('@/assets/pages/mti825.html'),
+    chapters: mti825Chapters,
+    // Examen blanc complet et liens : des chapitres à part, pas des cours à lire.
+    lessons: mti825Chapters.map((c) => c.id).filter((id) => id !== 'blanc' && id !== 'liens'),
     quizChapters: {},
-    questions: [],
-    cards: [],
+    questions: mti825Questions,
+    cards: mti825Cards,
+    slideKeys: [
+      ['lean', /lean|muda/],
+      ['agile', /agil/],
+      ['devops', /devops/],
+      ['archi', /architecture/],
+      ['cloud', /infonuag|cloud/],
+      ['itil', /itil/],
+      ['gouv', /seance.?1(?!\d)|gouvernance/],
+    ],
   },
 ];
 

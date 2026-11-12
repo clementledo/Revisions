@@ -37,7 +37,7 @@ export default function Review() {
         const due = dueCards(c).length;
         const tools: { icon: IconName; label: string; go: string }[] = [
           { icon: 'cards-outline', label: 'Cartes', go: `/cartes?course=${c.id}` },
-          { icon: 'format-list-checks', label: 'QCM', go: `/cours/${c.id}/quiz` },
+          ...(c.questions.some((q) => q.t !== 'ex') ? [{ icon: 'format-list-checks' as const, label: 'QCM', go: `/cours/${c.id}/quiz` }] : []),
           { icon: 'pencil-outline', label: 'Exercices', go: `/cours/${c.id}/exercices` },
           { icon: 'star-four-points-outline', label: 'Récaps', go: `/cours/${c.id}/liste?kind=recap` },
         ];

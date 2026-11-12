@@ -46,12 +46,14 @@ export default function CourseScreen() {
   const tools = (
     [
       { icon: 'cards-outline', label: 'Cartes', sub: due ? `${due} à revoir` : 'À jour', go: `/cartes?course=${id}` },
-      { icon: 'format-list-checks', label: 'QCM', sub: `${course.questions.length - exercises} questions`, go: `${base}/quiz` },
+      { icon: 'format-list-checks', label: 'QCM', sub: `${course.questions.length - exercises} questions`, go: `${base}/quiz`, show: course.questions.length > exercises },
       { icon: 'pencil-outline', label: 'Exercices', sub: exercises ? `${exercises} corrigés` : 'Avec correction', go: `${base}/exercices`, show: exercises || has((ch) => ch.examples) },
       { icon: 'star-four-points-outline', label: 'Récaps', sub: 'L’essentiel', go: `${base}/liste?kind=recap`, show: has((ch) => ch.hasRecap) },
       { icon: 'alert-outline', label: 'Pièges', sub: 'À l’examen', go: `${base}/liste?kind=traps`, show: has((ch) => ch.traps) },
       { icon: 'calculator-variant-outline', label: 'Calculs', sub: 'Interactifs', go: `${base}/liste?kind=calc`, show: has((ch) => ch.widgets.length) },
       { icon: 'sigma', label: 'Formules', sub: 'Aide-mémoire', go: `${base}/lire?ch=formules`, show: has((ch) => ch.id === 'formules') },
+      { icon: 'timer-outline', label: 'Examen', sub: 'Blanc, 3 h', go: `${base}/lire?ch=blanc`, show: has((ch) => ch.id === 'blanc') },
+      { icon: 'play-circle-outline', label: 'Vidéos', sub: 'Et ressources', go: `${base}/lire?ch=liens`, show: has((ch) => ch.id === 'liens') },
       { icon: 'file-document-outline', label: 'Antisèche', sub: 'Recto verso', go: `${base}/antiseche`, show: course.antiseche },
       { icon: 'presentation', label: 'Slides', sub: slides ? `${slides} PDF` : 'À ajouter', go: `${base}/slides` },
     ] satisfies Tool[]

@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Linking, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
 import { Empty } from '@/components/ui';
@@ -57,6 +57,14 @@ export function PageView({
       onMessage={handle}
       style={{ flex: 1, backgroundColor: p.bg }}
       containerStyle={{ backgroundColor: p.bg }}
+      // Les liens vers le web (vidéos, ressources) s'ouvrent dans le navigateur, pas dans la page.
+      onShouldStartLoadWithRequest={(r) => {
+        if (/^https?:/.test(r.url)) {
+          Linking.openURL(r.url);
+          return false;
+        }
+        return true;
+      }}
       setSupportMultipleWindows={false}
       textZoom={100}
       overScrollMode="never"

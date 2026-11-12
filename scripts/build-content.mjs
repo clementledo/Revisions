@@ -23,6 +23,14 @@ const COURSES = [
       gcl: 'Config. (GCL)', ppp: 'Processus', risque: 'Risque', plan: 'Plan qualité', fourn: 'Fournisseurs',
     },
   },
+  {
+    id: 'mti825',
+    parse: parseMts,
+    eyebrows: {
+      plan: 'Plan', rdmaic: 'RDMAIC', gouv: 'Gouvernance', lean: 'Lean', itil: 'ITIL 4', agile: 'Agilité',
+      devops: 'DevOps', archi: 'Architecture', cloud: 'Infonuagique', impart: 'Impartition', blanc: 'Examen blanc', liens: 'Liens',
+    },
+  },
 ];
 
 mkdirSync('assets/pages', { recursive: true });
@@ -152,6 +160,90 @@ function parseMgl(raw, conf) {
     if (a != null) return { ...q, t: 'qcm', o: el.querySelectorAll('.opt').map((o) => clean(o.childNodes.at(-1).text)), a: Number(a), e: toText(why) };
     return { ...q, t: 'ex', e: toText(el.querySelector('details .body')) };
   });
+  return { html, chapters, questions };
+}
+
+// --- Page MTI825 : onglets construits en JavaScript à partir d'un tableau M (fiche + examens blancs par thème).
+// On en fait une page statique avec une <section class="course"> par onglet, comme les autres cours ;
+// l'examen blanc complet (tirage au hasard + minuteur de 3 h) garde le code de la page.
+function parseMts(raw, conf) {
+  const html0 = raw.replace(/<!-- frame-runtime -->[\s\S]*?<!-- \/frame-runtime -->/, '');
+  const script = [...html0.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]).find((x) => x.includes('M.push('));
+  const data = script.slice(0, script.indexOf('/* ============ MOTEUR'));
+  const { M, LINKS } = new Function(`${data};return { M, LINKS };`)();
+  const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const exam = (e, key) =>
+    `<div class="exam" id="ex-${key}"><div class="hd"><h3 style="margin:0">${e.lvl === 2 ? '<span class="tag">Niveau 2</span>' : ''}Examen blanc · ${e.t}</h3><span class="pts">${e.pts}</span></div>` +
+    `<p class="q">${e.q}</p><textarea data-key="${key}" placeholder="Rédige ta réponse ici avant d’ouvrir le corrigé (brouillon gardé sur le téléphone)." aria-label="Ma réponse"></textarea>` +
+    `<details class="key"><summary>Voir le corrigé modèle</summary>${e.a}</details></div>`;
+  const sections = M.map(
+    (m) =>
+      `<section class="course" id="${m.id}"><h2>${m.title}</h2><p class="src">${m.src}</p>${m.secs.join('')}` +
+      (m.exams ?? []).map((e, i) => exam(e, m.id + i)).join('') +
+      '</section>',
+  );
+  sections.push(
+    '<section class="course" id="blanc"><h2>Examen blanc complet</h2><div id="blanc-body"></div></section>',
+    '<section class="course" id="liens"><h2>Vidéos et ressources</h2><p class="src">Liens tirés de ta page Moodle MTI825 · s’ouvrent dans le navigateur</p>' +
+      LINKS.map((g) => `<div class="card"><h3>${g.g}</h3><ul>${g.items.map((it) => `<li><a href="${it.u}">${esc(it.n)}</a></li>`).join('')}</ul></div>`).join('') +
+      '</section>',
+  );
+  // Moteur de l'examen complet, repris de la page (brouillons gardés dans le stockage de la page).
+  const engine = script.slice(script.indexOf('/* ---- examen complet ---- */'), script.indexOf('allTabs().forEach'));
+  const runtime = `<script>
+var M=${JSON.stringify(M.filter((m) => m.exams))};
+var CASES=M.find(function(m){return m.id==="rdmaic"}).exams;
+var THEMES=M.filter(function(m){return m.id!=="rdmaic"});
+var store={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+function examHtml(e,key){var saved=store.get("draft:"+key)||"";
+  return '<div class="exam"><div class="hd"><h3 style="margin:0">'+(e.lvl===2?'<span class="tag">Niveau 2</span>':'')+'Examen blanc · '+e.t+'</h3><span class="pts">'+e.pts+'</span></div>'+
+  '<p class="q">'+e.q+'</p><textarea data-key="'+key+'" aria-label="Ma réponse">'+saved.replace(/</g,"&lt;")+'</textarea>'+
+  '<details class="key"><summary>Voir le corrigé modèle</summary>'+e.a+'</details></div>';}
+var main=null;
+function render(){main=document.getElementById("blanc-body");if(!main)return;main.innerHTML=finalHtml();initFinal();}
+${engine}
+document.addEventListener("DOMContentLoaded",function(){
+  render();
+  [].forEach.call(document.querySelectorAll("section:not(#blanc) textarea[data-key]"),function(ta){
+    ta.value=store.get("draft:"+ta.dataset.key)||"";
+    ta.addEventListener("input",function(){store.set("draft:"+ta.dataset.key,ta.value)});
+  });
+});
+</script>`;
+  const head = html0.slice(0, html0.indexOf('<div class="wrap">'));
+  const html = `${head}<div class="wrap"><main>${sections.join('\n')}</main></div>${runtime}</body></html>`;
+
+  const root = parse(html);
+  const chapters = root.querySelectorAll('section.course').map((sec) => {
+    const m = M.find((x) => x.id === sec.id);
+    const body = sec.clone();
+    body.querySelectorAll('.exam, script').forEach((x) => x.remove());
+    return {
+      id: sec.id,
+      eyebrow: conf.eyebrows[sec.id] ?? m?.tag ?? '',
+      title: clean(sec.querySelector('h2').text),
+      lede: m ? clean(parse(m.src).text) : '',
+      sections: h3s(sec),
+      // Les examens blancs sont repris comme exercices de l'app (écran Exercices).
+      examples: 0,
+      traps: sec.querySelectorAll('.trap').length,
+      hot: false,
+      widgets: [],
+      hasRecap: false,
+      text: clean(body.text),
+    };
+  });
+  // Chaque examen blanc devient un exercice à corrigé dans l'app.
+  const questions = M.flatMap((m) =>
+    (m.exams ?? []).map((e, i) => ({
+      c: 0,
+      t: 'ex',
+      n: `${conf.eyebrows[m.id]} ${i + 1}`,
+      ch: m.id,
+      q: `${e.t} (${e.pts}${e.lvl === 2 ? ', niveau 2' : ''})\n\n${toText(parse(`<div>${e.q}</div>`).firstChild)}`,
+      e: toText(parse(`<div>${e.a}</div>`).firstChild),
+    })),
+  );
   return { html, chapters, questions };
 }
 

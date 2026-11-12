@@ -1,0 +1,574 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Révision MTI825</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Concept : cahier de révision à onglets, une fiche + un examen blanc par thème. Rouge ÉTS sur neutres bleutés. */
+:root{
+  --bg:#F4F6F9; --surface:#FFFFFF; --ink:#13181F; --muted:#586272; --line:#DCE1E8;
+  --accent:#B3122B; --accent-soft:#FBE8EB; --ok:#1B7A4B; --ok-soft:#E3F3EA; --warn:#8F5600; --warn-soft:#FBF0DC;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1218; --surface:#161B23; --ink:#E7EAEF; --muted:#9AA4B2; --line:#283039;
+  --accent:#FF6277; --accent-soft:#2B1519; --ok:#5CCB92; --ok-soft:#112A1E; --warn:#E8B24F; --warn-soft:#2A2110; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1218; --surface:#161B23; --ink:#E7EAEF; --muted:#9AA4B2; --line:#283039;
+  --accent:#FF6277; --accent-soft:#2B1519; --ok:#5CCB92; --ok-soft:#112A1E; --warn:#E8B24F; --warn-soft:#2A2110; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:900px;margin:0 auto}
+header{padding-block:28px 14px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;justify-content:space-between}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,40px);line-height:1.05;margin:0;letter-spacing:-.02em}
+.sub{color:var(--muted);margin:6px 0 0;max-width:52ch}
+.count{font-family:var(--mono);font-size:13px;border:1px solid var(--line);background:var(--surface);padding:8px 12px;border-radius:6px;text-align:right}
+.count b{color:var(--accent);font-size:20px;display:block;line-height:1.1}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding-block:8px;border-bottom:1px solid var(--line);margin-bottom:22px}
+nav .row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px}
+nav button{flex:0 0 auto;font:inherit;font-size:13px;font-weight:500;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 11px;border-radius:6px;cursor:pointer;white-space:nowrap}
+nav button:hover{border-color:var(--accent)}
+nav button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+nav button .d{font-family:var(--mono);font-size:11px;opacity:.7;margin-right:5px}
+nav button.done::after{content:" ✓";color:var(--ok)}
+nav button[aria-selected="true"].done::after{color:#fff}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h2{font-family:var(--display);font-weight:800;font-size:clamp(24px,4vw,32px);margin:0 0 4px;letter-spacing:-.01em;text-wrap:balance}
+.src{font-family:var(--mono);font-size:12px;color:var(--muted);margin:0 0 18px}
+h3{font-family:var(--display);font-size:17px;margin:0 0 8px;font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-bottom:14px;min-width:0}
+.card p{margin:0 0 8px}.card p:last-child{margin-bottom:0}
+ul,ol{margin:6px 0 0;padding-left:20px}li{margin:3px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:14px}
+.grid .card{margin:0}
+.tw{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--bg);font-weight:600}
+.trap{background:var(--warn-soft);border:1px solid var(--warn);border-radius:8px;padding:12px 16px;margin-bottom:14px}
+.trap h3{color:var(--warn);margin-bottom:4px}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;background:var(--accent-soft);color:var(--accent);padding:1px 6px;border-radius:4px;margin-right:4px}
+.exam{border:2px solid var(--accent);border-radius:8px;padding:16px 18px;background:var(--surface);margin-top:22px}
+.exam .hd{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.exam .pts{font-family:var(--mono);font-size:12px;background:var(--accent);color:#fff;padding:2px 8px;border-radius:4px}
+.q{white-space:pre-line}
+textarea{width:100%;min-height:130px;font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;resize:vertical;margin-top:10px}
+details.key{margin-top:10px;border:1px solid var(--ok);background:var(--ok-soft);border-radius:6px;padding:10px 14px}
+details.key summary{cursor:pointer;font-weight:600;color:var(--ok)}
+details.key[open] summary{margin-bottom:8px}
+.btn{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--accent);background:var(--accent);color:#fff;padding:8px 14px;border-radius:6px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent)}
+.fait{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px}
+.timer{font-family:var(--mono);font-size:34px;font-weight:500}
+.hint{color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:no-preference){.panel{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(3px)}}}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <h1>Révision MTI825</h1>
+    <p class="sub">Les méthodes à connaître et un examen blanc par thème, bâtis sur les diapos des séances 1 à 11.</p>
+  </div>
+  <div class="count" id="count"></div>
+</header>
+<nav aria-label="Modules"><div class="row" id="tabs" role="tablist"></div></nav>
+<main id="main"></main>
+</div>
+
+<script>
+var M=[];
+
+/* ============ 0. PLAN ============ */
+M.push({id:"plan",tag:"Plan",title:"Plan de match",src:"Examen final · 2 déc. 2026 · 18 h à 21 h · D-3010 · papier, aucune documentation · 40 % de la note",
+secs:[
+`<div class="grid">
+<div class="card"><h3>Q1 · Cas RDMAIC · 50 %</h3><p>Un cas est décrit. Tu déroules la démarche complète et tu justifies chaque choix avec les données du cas.</p><p class="hint">Cible : environ 85 min</p></div>
+<div class="card"><h3>Q2 · Thème · 25 %</h3><p>Un sujet principal du cours : théorie reliée à des exemples concrets.</p><p class="hint">Cible : environ 40 min</p></div>
+<div class="card"><h3>Q3 · Thème · 25 %</h3><p>Même format que Q2, sur un autre thème.</p><p class="hint">Cible : environ 40 min</p></div></div>`,
+`<div class="card"><h3>Gabarit de réponse pour Q2 et Q3</h3><ol><li><b>Définition</b> en une phrase, avec les termes du cours.</li><li><b>Mécanisme</b> : étapes, composantes, rôles (liste numérotée, c'est ce que le correcteur cherche).</li><li><b>Exemple concret</b> : un cas précis avec des chiffres ou des noms, pas « une entreprise quelconque ».</li><li><b>Lien</b> avec un autre thème (Lean ↔ DevOps, ITIL ↔ amélioration continue…) et une <b>limite</b>.</li></ol></div>`,
+`<div class="card"><h3>Ton exemple maître : Formule ÉTS</h3><p>Sans documentation, un exemple que tu connais par cœur vaut mieux qu'un exemple générique. Ton travail de session en contient pour presque chaque thème :</p><ul>
+<li><b>Lean</b> : attente et non-qualité dans la création des comptes (un compte jamais créé parce que le chef d'équipe n'a pas annoncé l'adhésion ; comptes créés en lot).</li>
+<li><b>ITIL</b> : demande de service (compte Gmail, AD, GitLab, Vaultwarden, 3DEXPERIENCE) vs incident ; absence de date d'acceptation enregistrée.</li>
+<li><b>Cloud / sécurité</b> : plusieurs plateformes à cause du budget d'un OBNL, gestion des accès, Vaultwarden.</li>
+<li><b>RDMAIC</b> : tes causes racines (aucune structure ni ressource dédiée, budget d'OBNL, projet complexe avec pics d'adhésion, club de course et non club TI, roulement de bénévoles).</li></ul>
+<p class="hint">Vérifie les chiffres avec ton A3 final avant de les citer.</p></div>`,
+`<div class="trap"><h3>Rappel du TP1</h3><p>Le TP1 a été échoué sur la <b>posture</b> et la preuve terrain, pas sur le contenu. À l'examen, la même logique s'applique : le correcteur veut voir la démarche appliquée au cas, pas une récitation.</p></div>`
+]});
+
+/* ============ 1. RDMAIC ============ */
+M.push({id:"rdmaic",tag:"Q1 · 50 %",title:"Démarche RDMAIC",src:"S01 · S02 · S05-06 (vidéos DMAIC, Ishikawa, 5 Pourquoi, cartographie) · directives du travail de session",
+secs:[
+`<div class="card"><p>RDMAIC = <b>R</b>econnaître, <b>D</b>éfinir, <b>M</b>esurer, <b>A</b>nalyser, <b>I</b>nnover (améliorer), <b>C</b>ontrôler. C'est un DMAIC (Lean Six Sigma) précédé d'une étape de reconnaissance. Pour chaque phase du cas, nomme la question, l'outil, le livrable et ce qui vient du cas.</p></div>
+<div class="tw"><table><thead><tr><th>Phase</th><th>Question à laquelle tu réponds</th><th>Outils du cours</th><th>Livrable</th></tr></thead><tbody>
+<tr><td><b>R</b>econnaître</td><td>Quel est le problème perçu, pour qui, avec quels symptômes ?</td><td>Persona, parties prenantes, observation sur le terrain (gemba), constat de la valeur perdue</td><td>Énoncé du problème, contexte, sponsor</td></tr>
+<tr><td><b>D</b>éfinir</td><td>Quel est le périmètre et quel résultat vise-t-on ?</td><td>Objectif <b>SMART</b>, <b>FIPEC</b> (SIPOC : fournisseurs, intrants, processus, extrants, clients)</td><td>Cible chiffrée et datée, frontières du processus</td></tr>
+<tr><td><b>M</b>esurer</td><td>Quelle est l'ampleur réelle aujourd'hui ?</td><td>Collecte de données, cartographie du processus (temps actif vs attente, lead time), indicateurs de base</td><td>Situation de départ chiffrée (baseline)</td></tr>
+<tr><td><b>A</b>nalyser</td><td>Pourquoi le problème existe-t-il ?</td><td><b>Ishikawa</b> (5M : méthode, matériel, matière, milieu, main-d'œuvre), <b>5 Pourquoi</b>, 8 gaspillages Lean, Pareto</td><td>Causes racines vérifiées par les données</td></tr>
+<tr><td><b>I</b>nnover</td><td>Quelles solutions, lesquelles retenir, comment les déployer ?</td><td><b>Technique Disney</b> (rêveur, réaliste, critique), Yellow Box, priorisation, Gantt, pilote</td><td>Solutions retenues liées aux causes, plan d'implantation</td></tr>
+<tr><td><b>C</b>ontrôler</td><td>Est-ce que ça marche et ça se maintient ?</td><td>Mesures avant/après vs cible SMART, standardisation, tableau de bord, PDCA, amélioration continue ITIL</td><td>Résultats, bilan, plan de suivi</td></tr>
+</tbody></table></div>`,
+`<div class="grid">
+<div class="card"><h3>Un bon objectif SMART</h3><ul><li><b>S</b>pécifique : quel processus, quel indicateur</li><li><b>M</b>esurable : valeur de départ et valeur cible</li><li><b>A</b>tteignable avec les ressources du cas</li><li><b>R</b>éaliste / pertinent pour le client</li><li><b>T</b>emporel : une date</li></ul><p class="hint">Modèle : « Réduire X de A à B d'ici la date, mesuré par Y. »</p></div>
+<div class="card"><h3>Cartographier pour mesurer</h3><ul><li>Étapes en couloirs (swimlane) par acteur</li><li>Temps actif et temps d'attente par étape</li><li>Lead time = demande → livraison</li><li>Repère les 8 gaspillages directement sur la carte</li></ul></div>
+<div class="card"><h3>Causes racines</h3><ul><li>Ishikawa pour ratisser large, 5 Pourquoi pour creuser une branche</li><li>Une cause racine est actionnable et se vérifie par une donnée</li><li>Chaque solution doit viser au moins une cause racine</li></ul></div></div>`,
+`<div class="card"><h3>Lien avec ITIL et PDCA</h3><p>RDMAIC est ta démarche de projet. L'amélioration continue ITIL (vision, où sommes-nous, où voulons-nous aller, comment y parvenir, passer à l'action, conserver l'élan) en est le cadre permanent : la phase <b>Contrôler</b> alimente le prochain cycle. PDCA (planifier, faire, vérifier, agir) sert à piloter chaque amélioration.</p></div>`,
+`<div class="trap"><h3>Pièges d'examen</h3><ul>
+<li>Proposer des solutions sans avoir mesuré ni trouvé de causes racines.</li>
+<li>Un objectif sans valeur de départ ni date (donc non SMART).</li>
+<li>Oublier d'utiliser les chiffres du cas : chaque phase doit citer au moins une donnée.</li>
+<li>Négliger la phase Contrôler : sans indicateur de suivi et propriétaire, rien ne tient.</li>
+<li>Ignorer le changement humain (formation, résistance) dans le plan d'implantation.</li></ul></div>`
+],
+exams:[
+{pts:"50 %",t:"Cas : Centre de services de la Coopérative Rive-Nord",
+q:`Cas fictif. La Coopérative de santé Rive-Nord compte 45 employés. Son centre de services TI (2 techniciens et 1 gestionnaire) reçoit environ 320 tickets par mois. Le délai moyen de résolution est de 3,4 jours ouvrables alors que l'entente de service promet 1 jour. La satisfaction des usagers est de 58 %. Environ 28 % des tickets sont des réinitialisations de mot de passe, 17 % des pannes VPN qui reviennent chaque semaine, et 35 % des tickets sont mal catégorisés. Les techniciens se partagent les tickets de vive voix, sans file d'attente visible. La direction veut un service fiable avant l'audit de l'automne.
+
+Appliquez la démarche RDMAIC à ce cas. Pour chaque phase, indiquez les outils utilisés, les données à recueillir et les livrables, puis justifiez vos solutions par les causes racines.`,
+a:`<p><b>R – Reconnaître.</b> Problème : le service promis (1 jour) n'est pas tenu (3,4 jours), satisfaction 58 %. Parties prenantes : usagers, 2 techniciens, gestionnaire, direction (audit). Gemba : observer comment un ticket circule réellement (vive voix, pas de file visible).</p>
+<p><b>D – Définir.</b> SMART : « Faire passer le délai moyen de résolution de 3,4 à 1,5 jour ouvrable ou moins, et la satisfaction de 58 % à 75 % ou plus, d'ici 12 semaines, avant l'audit. » FIPEC : fournisseurs (usagers, éditeur du VPN), intrants (appel, courriel, ticket), processus (enregistrer, catégoriser, diagnostiquer, résoudre, fermer), extrants (incident résolu, usager informé), clients (employés).</p>
+<p><b>M – Mesurer.</b> Cartographier le cycle d'un ticket en couloirs (usager, technicien, gestionnaire). Mesurer lead time, temps actif vs attente par étape, taux de réouverture, tickets par catégorie. Constat à confirmer : 28 % mots de passe + 17 % VPN = 45 % du volume (Pareto). Fiabiliser d'abord la catégorisation (35 % erronée) pour que les mesures soient crédibles.</p>
+<p><b>A – Analyser.</b> Ishikawa : <i>Méthode</i> (pas de file ni de priorités, pas de gestion des problèmes), <i>Matériel</i> (aucun libre-service de mots de passe), <i>Matière</i> (catégories mal remplies, pas de base de connaissances), <i>Main-d'œuvre</i> (2 techniciens, pas de rôles), <i>Milieu</i> (demandes en vive voix). 5 Pourquoi sur le VPN : revient chaque semaine → la cause n'est jamais traitée → seuls les incidents sont fermés → aucune gestion des problèmes → pas de rôle ni de temps dédié. Gaspillages Lean : attente, travail inutile répété (mots de passe), non-qualité (VPN), transport (vive voix), sous-utilisation des compétences (techniciens sur des tâches répétitives).</p>
+<p><b>I – Innover.</b> Technique Disney pour générer, puis retenir : (1) libre-service de réinitialisation des mots de passe (cible 28 %), (2) gestion des problèmes ITIL sur le VPN avec erreur connue et contournement documenté, (3) file de tickets Kanban avec limite de travail en cours, (4) catégorisation obligatoire et base de connaissances. Plan avec Gantt, pilote de 2 semaines sur les mots de passe, formation et communication aux usagers (changement).</p>
+<p><b>C – Contrôler.</b> Mesurer après vs avant sur la cible SMART (délai, satisfaction, volume de mots de passe, récurrence VPN). Tableau de bord hebdomadaire, propriétaire désigné, revue mensuelle, standardiser les procédures, PDCA et amélioration continue pour la suite.</p>
+<p class="hint">Points qui rapportent : chiffres du cas dans chaque phase, lien explicite solution ↔ cause racine, objectif SMART complet, phase Contrôler avec propriétaire.</p>`},
+{pts:"50 %",t:"Cas : Mises en production de Boutique Aurore",
+q:`Cas fictif. Boutique Aurore (e-commerce, 12 développeurs, 3 personnes aux opérations) livre une nouvelle version de son site une fois par trimestre. Chaque livraison exige un week-end de travail manuel, 40 % des livraisons causent un incident majeur (page de paiement indisponible en moyenne 3 heures) et les demandes des clients mettent en moyenne 11 semaines à arriver en production. Les développeurs disent que les opérations bloquent, les opérations disent que le code arrive incomplet. Le propriétaire veut livrer plus vite sans multiplier les pannes.
+
+Appliquez la démarche RDMAIC en justifiant vos choix.`,
+a:`<p><b>R.</b> Problème : délai de 11 semaines, pannes dans 40 % des livraisons, tension Dev/Ops. Impacts : ventes perdues pendant les 3 h de panne, équipes épuisées.</p>
+<p><b>D.</b> SMART : « Réduire le délai idée → production de 11 à 4 semaines ou moins et le taux de livraisons avec incident majeur de 40 % à 10 % ou moins en 6 mois. » FIPEC de la livraison : fournisseurs (développeurs, produit), intrants (code, demandes), processus (build, test, déploiement, vérification), extrants (version en production), clients (acheteurs, marketing).</p>
+<p><b>M.</b> Cartographie du flux de valeur : temps actif vs attente (l'attente entre « code terminé » et « déployé » domine probablement). Mesurer fréquence de livraison, lead time, taux d'échec, durée de rétablissement. Compter les étapes manuelles.</p>
+<p><b>A.</b> Gaspillages : attente (fenêtre trimestrielle), stocks (gros lots de code), non-qualité (bugs en production), transport (passation Dev → Ops). Causes : livraisons en gros lots (risque élevé par livraison), tests et déploiement manuels, silos Dev/Ops sans responsabilité partagée, absence de rétroaction rapide. 5 Pourquoi sur les pannes : lot énorme → tests insuffisants → déploiement manuel → pas d'environnement de préproduction identique.</p>
+<p><b>I.</b> Réponse DevOps : CALMS (culture de responsabilité partagée, automatisation, Lean, mesure, partage). Intégration continue, pipeline de livraison automatisé avec tests, déploiement en continu en petits lots, retour arrière rapide, surveillance. Les trois voies : flux (petits lots), rétroaction (alertes, tests automatiques), apprentissage continu (revues post-incident sans blâme). Pilote sur un seul module, puis extension.</p>
+<p><b>C.</b> Indicateurs : fréquence de livraison, lead time, taux d'échec, temps de rétablissement. Gestion des changements : changements standards pré-approuvés pour ce qui est automatisé, CAB pour les majeurs. Revue mensuelle et amélioration continue.</p>`}
+]});
+
+/* ============ 2. GOUVERNANCE ============ */
+M.push({id:"gouv",tag:"S01",title:"Gouvernance TI et cadres de référence",src:"S01 : diapos 6 à 40 · cadres COBIT, ISO, ITIL, TOGAF, Agile, DevOps, MLOps, AIOps",
+secs:[
+`<div class="grid">
+<div class="card"><h3>Concepts de valeur</h3><ul>
+<li><b>Service</b> : moyen de permettre la co-création de valeur.</li>
+<li><b>Valeur</b> = <b>utilité</b> (ce que ça fait, la fonctionnalité) + <b>garantie</b> (disponibilité, capacité, continuité, sécurité : « ça marche de façon fiable »).</li>
+<li><b>Co-création</b> : le fournisseur (le département TI) et le consommateur (l'équipe de vente par exemple) créent la valeur ensemble.</li>
+<li><b>Produit</b> : configuration de ressources offerte à un consommateur.</li></ul></div>
+<div class="card"><h3>Gouvernance vs gestion</h3><ul>
+<li><b>Gouvernance</b> : évaluer, diriger, surveiller. Le conseil fixe la direction et les règles (ISO/IEC 38500, COBIT).</li>
+<li><b>Gestion</b> : planifier, bâtir, exploiter, mesurer, pour exécuter dans cette direction (ITIL, ISO 20000, projets).</li>
+<li>Exemple : le conseil d'administration exige un taux de disponibilité du portail (gouvernance), le gestionnaire TI met en place la surveillance et les changements (gestion).</li></ul></div></div>`,
+`<div class="tw"><table><thead><tr><th>Cadre</th><th>Sert à</th><th>Famille</th></tr></thead><tbody>
+<tr><td>COBIT 2019</td><td>Gouvernance et gestion des TI de l'entreprise</td><td>Gouvernance</td></tr>
+<tr><td>ISO/IEC 38500</td><td>Principes de gouvernance des TI pour les dirigeants</td><td>Gouvernance</td></tr>
+<tr><td>ISO 31000</td><td>Gestion des risques</td><td>Risques</td></tr>
+<tr><td>ITIL v4 · ISO/IEC 20000</td><td>Gestion des services TI (pratiques · norme certifiable)</td><td>Services</td></tr>
+<tr><td>ISO/IEC 27000</td><td>Sécurité de l'information</td><td>Sécurité</td></tr>
+<tr><td>BABOK</td><td>Analyse d'affaires</td><td>Exigences</td></tr>
+<tr><td>TOGAF</td><td>Architecture d'entreprise (méthode ADM)</td><td>Architecture</td></tr>
+<tr><td>PRINCE2 · PMBOK</td><td>Gestion de projets</td><td>Projets</td></tr>
+<tr><td>Scrum · XP · Disciplined Agile · SAFe · Spotify</td><td>Développement agile, petites équipes puis grande échelle</td><td>Agilité</td></tr>
+<tr><td>CMMI</td><td>Maturité des processus</td><td>Qualité</td></tr>
+<tr><td>DevOps · MLOps · AIOps</td><td>Collaboration Dev/Ops · apprentissage machine en production · IA appliquée aux opérations</td><td>Pratiques</td></tr>
+</tbody></table></div>`,
+`<div class="trap"><h3>Pièges d'examen</h3><ul>
+<li>Confondre cadre (ITIL, TOGAF), norme certifiable (ISO 20000, ISO 27001) et méthode (Scrum, DMAIC).</li>
+<li>Réduire la valeur à la fonctionnalité : sans garantie, il n'y a pas de valeur.</li>
+<li>Parler de « bonnes pratiques » sans dire quel problème elles règlent dans le cas.</li></ul></div>`
+],
+exams:[{pts:"25 %",t:"Gouvernance, gestion et cadres",
+q:`Expliquez la différence entre gouvernance et gestion des TI. Montrez comment au moins quatre cadres ou normes (par exemple COBIT, ISO/IEC 38500, ITIL, ISO/IEC 20000, ISO 27000, TOGAF) se complètent dans une organisation, et illustrez par un exemple concret.`,
+a:`<p><b>Définition.</b> Gouvernance = évaluer, diriger et surveiller (le conseil fixe la direction et les règles). Gestion = planifier, bâtir, exploiter et mesurer pour exécuter cette direction.</p>
+<p><b>Mécanisme (complémentarité).</b> ISO/IEC 38500 donne les principes aux dirigeants ; COBIT les traduit en objectifs de gouvernance et de gestion avec des mesures ; ITIL fournit les pratiques de gestion des services (incidents, changements, niveaux de service) ; ISO 20000 permet de faire certifier ce système de gestion ; ISO 27000 encadre la sécurité de l'information ; TOGAF aligne l'architecture sur la stratégie ; ISO 31000 structure la gestion des risques.</p>
+<p><b>Exemple concret.</b> Un club étudiant comme Formule ÉTS : le comité (gouvernance) décide que tout membre actif doit avoir ses comptes en ≤ 7 jours et que les mots de passe sont dans un coffre (Vaultwarden) ; le responsable TI (gestion) définit la procédure de création de comptes, un suivi des demandes et une revue des accès.</p>
+<p><b>Lien et limite.</b> Les cadres ne s'excluent pas : on prend ce qui répond au problème (approche pragmatique). Limite : un cadre appliqué sans adaptation crée de la bureaucratie (gaspillage de surtraitement en Lean).</p>`}]});
+
+/* ============ 3. LEAN ============ */
+M.push({id:"lean",tag:"S02",title:"Lean et gaspillages",src:"S02 : diapos 5 à 41 · Fiche « Les MUDAS dans le monde des services »",
+secs:[
+`<div class="grid">
+<div class="card"><h3>Toyota Way · 14 principes (4P)</h3><ul>
+<li><b>Philosophie</b> : décisions à long terme (1)</li>
+<li><b>Processus</b> : flux continu, système tiré, niveler la charge, arrêter pour corriger (qualité du premier coup), standardiser, contrôle visuel, technologies éprouvées (2 à 8)</li>
+<li><b>Personnel et partenaires</b> : former des leaders, des équipes, respecter les fournisseurs (9 à 11)</li>
+<li><b>Résolution de problèmes</b> : aller voir sur place (genchi genbutsu), décider par consensus et agir vite, apprendre en continu (kaizen) (12 à 14)</li></ul></div>
+<div class="card"><h3>Flux et temps</h3><ul>
+<li><b>Juste-à-temps</b> : produire ce qu'il faut, quand il faut.</li>
+<li><b>Flux poussé</b> (selon prévisions) vs <b>flux tiré</b> (selon la demande réelle, ex. Kanban).</li>
+<li><b>Takt time</b> : rythme imposé par la demande client (temps disponible ÷ demande).</li>
+<li><b>Lead time</b> : temps total entre la demande et la livraison.</li></ul></div></div>`,
+`<div class="tw"><table><thead><tr><th>Gaspillage (7 + 1)</th><th>En TI classique</th><th>À l'ère de l'IA</th></tr></thead><tbody>
+<tr><td>1 Surproduction</td><td>Fonctionnalités non demandées (« gold plating »)</td><td>Modèles trop complexes, IA « pour la tendance »</td></tr>
+<tr><td>2 Attente</td><td>Validation, comité, fenêtre de déploiement</td><td>Accès aux données, entraînement d'un modèle</td></tr>
+<tr><td>3 Transport</td><td>Transferts entre silos (analyste → dév → QA)</td><td>Pipelines de données fragiles, passation de modèles entre équipes</td></tr>
+<tr><td>4 Traitements inutiles</td><td>Documentation que personne ne lit, sur-ingénierie</td><td>Sur-nettoyage des données, réentraînement manuel</td></tr>
+<tr><td>5 Stocks</td><td>Travail en cours non fusionné ou non testé</td><td>Modèles entraînés jamais déployés, jeux de données non utilisés</td></tr>
+<tr><td>6 Mouvements</td><td>Changements de contexte, réunions inutiles</td><td>Charge cognitive entre plusieurs outils</td></tr>
+<tr><td>7 Défauts</td><td>Bugs en production, reprises, dette technique</td><td>Biais, hallucinations, dérive de modèle</td></tr>
+<tr><td>+1 Sous-utilisation des compétences</td><td>Experts sur tâches subalternes, suggestions ignorées</td><td>Experts réduits à l'étiquetage</td></tr>
+</tbody></table></div>
+<div class="card"><h3>Moyens de réduction</h3><ul><li>Surproduction : développement itératif, MVP, YAGNI ; version IA : preuve de valeur avant de construire, modèle de base simple.</li><li>Attente : CI/CD, limites de travail en cours (WIP), équipes autonomes ; version IA : DataOps, MLOps, ressources élastiques.</li></ul></div>`,
+`<div class="trap"><h3>Pièges d'examen</h3><ul>
+<li>Réciter les 8 sans les placer dans un processus précis : donne toujours un exemple de service TI.</li>
+<li>Confondre takt time (la demande) et lead time (le délai de bout en bout).</li>
+<li>Oublier le « +1 » (sous-utilisation du potentiel des employés).</li></ul></div>`
+],
+exams:[{pts:"25 %",t:"Lean appliqué à un service TI",
+q:`Présentez les principes du Lean (Toyota Way, juste-à-temps, takt time, lead time) et les 8 gaspillages. Appliquez-les à un service TI concret de votre choix en donnant, pour au moins quatre gaspillages, un exemple et un moyen de le réduire. Précisez ce qui change à l'ère de l'IA.`,
+a:`<p><b>Définition.</b> Lean = maximiser la valeur pour le client en éliminant le gaspillage et en améliorant le flux en continu (culture + outils). Toyota Way : 14 principes en 4P (philosophie, processus, personnel et partenaires, résolution de problèmes).</p>
+<p><b>Mécanisme.</b> Juste-à-temps et flux tiré (on produit sur la demande réelle, ex. Kanban). Takt time = rythme de la demande ; lead time = délai total demande → livraison. 8 gaspillages : surproduction, attente, transport, traitements inutiles, stocks, mouvements, défauts, sous-utilisation du potentiel.</p>
+<p><b>Exemple (centre de services).</b> Attente : ticket qui attend 2 jours une approbation → délégation et changements standards. Défauts : même panne VPN qui revient → gestion des problèmes. Traitements inutiles : 6 champs de formulaire jamais lus → simplifier. Sous-utilisation : technicien senior qui réinitialise des mots de passe → libre-service. Surproduction : rapports mensuels que personne ne consulte → les arrêter.</p>
+<p><b>Ère de l'IA.</b> Nouvelles formes : attente des données et de l'entraînement, modèles dormants (stocks), biais et dérive (défauts), experts réduits à l'étiquetage. Moyens : preuve de valeur avant de bâtir, DataOps/MLOps, modèle de base simple.</p>
+<p><b>Lien et limite.</b> Lean alimente DevOps (flux de valeur, CALMS) et RDMAIC (phases Mesurer et Analyser). Limite : optimiser un morceau du flux sans regarder le bout en bout déplace le goulot ailleurs.</p>`}]});
+
+/* ============ 4. ITIL ============ */
+M.push({id:"itil",tag:"S03 · S05-06 · S09-10",title:"ITIL 4 : pratiques et amélioration continue",src:"S03 · S05-06 (diapos ITIL 4.1 à 4.3) · S09-10 (pratiques générales) · cas NovaCampus",
+secs:[
+`<div class="grid">
+<div class="card"><h3>Trois familles de pratiques</h3><ul>
+<li><b>Générales</b> : amélioration continue, mesures et rapport, relations, connaissances, stratégie, finances, architecture, portefeuille, projets, changements organisationnels, compétences, risques, sécurité, fournisseurs.</li>
+<li><b>Gestion des services TI</b> : analyse d'affaires, conception, niveaux de service, actifs, configurations, validation et tests, livraisons, catalogue, surveillance, disponibilité, capacité, centre de services, demandes, incidents, problèmes, changements, continuité.</li>
+<li><b>Techniques</b> : déploiement, infrastructure et plateformes, développement logiciel.</li></ul></div>
+<div class="card"><h3>Incident · problème · changement</h3><ul>
+<li><b>Incident</b> : interruption non prévue ou baisse de qualité. But : <i>restaurer vite</i>. Incident majeur : procédure distincte, délais plus courts.</li>
+<li><b>Problème</b> : cause sous-jacente <i>inconnue</i> d'un ou plusieurs incidents. Phases : identification, contrôle des problèmes, contrôle des erreurs.</li>
+<li><b>Solution de contournement</b> : réduit l'impact sans corriger la cause.</li>
+<li><b>Erreur connue</b> : problème avec cause documentée et contournement.</li>
+<li><b>Changement</b> : modification d'infrastructure, applications, documentation, processus. But : équilibrer valeur et risque.</li></ul></div></div>`,
+`<div class="grid">
+<div class="card"><h3>Types de changement</h3><ul><li><b>Standard</b> : pré-approuvé, peu risqué, connu, idéalement automatisé.</li><li><b>Normal</b> : analysé et priorisé ; majeur ou significatif → CAB (comité consultatif des changements).</li><li><b>Urgent</b> : ECAB, pour un correctif d'incident.</li><li>Fin de cycle : validation, livraison, déploiement, revue post-implantation (PIR).</li></ul></div>
+<div class="card"><h3>Amélioration continue en 6 étapes</h3><ol><li>La vision</li><li>Où sommes-nous ?</li><li>Où voulons-nous aller ? (écart, objectifs, indicateurs)</li><li>Comment y parvenir ? (plan détaillé ou cycle agile)</li><li>Passer à l'action (et évaluer l'avancement)</li><li>Conserver l'élan</li></ol><p class="hint">Activités : budget, registre des améliorations, priorisation par SWOT, étude coûts/bénéfices, PDCA.</p></div>
+<div class="card"><h3>Autres pratiques à savoir expliquer</h3><ul><li><b>Catalogue de services</b> : source unique d'information sur les services offerts.</li><li><b>Niveaux de service</b> : objectifs clairs et mesurés (SLA).</li><li><b>Configuration</b> : un CI est un composant à gérer ; le CMS stocke les CI et leurs liens.</li><li><b>Continuité</b> : BIA, plans de reprise, tests.</li><li><b>Fournisseurs</b> : interne, externe, partenariat, multi-sourcing.</li></ul></div></div>`,
+`<div class="trap"><h3>Pièges d'examen</h3><ul>
+<li>Un problème n'est pas « un incident grave » : c'est la cause inconnue derrière un ou plusieurs incidents.</li>
+<li>Une solution de contournement n'est pas une résolution.</li>
+<li>Passer par le processus des changements pour tout : les changements standards sont pré-approuvés.</li>
+<li>Décrire ITIL comme un processus rigide : en contexte agile, les changements font partie de la collaboration régulière avec le client.</li></ul></div>`
+],
+exams:[{pts:"25 %",t:"Incidents, problèmes et changements",
+q:`Un VPN tombe en panne chaque lundi matin depuis un mois. Distinguez incident, problème, solution de contournement, erreur connue et changement, puis décrivez comment chacune des pratiques ITIL correspondantes traiterait ce scénario. Montrez le rôle du centre de services et de la gestion des changements.`,
+a:`<p><b>Définitions.</b> Incident : interruption non prévue (la panne du lundi). Problème : cause inconnue derrière ces pannes récurrentes. Contournement : réduit l'impact sans corriger (ex. redémarrer le concentrateur VPN à 7 h 55). Erreur connue : problème dont la cause est documentée avec contournement. Changement : correction durable de l'infrastructure.</p>
+<p><b>Flux.</b> 1) Centre de services : enregistrer, catégoriser, prioriser, diagnostic initial, appliquer le contournement si une erreur connue existe, escalader au niveau 2 ou 3 si besoin, informer l'usager, fermer. 2) Gestion des problèmes : plusieurs incidents identiques → ouvrir un problème, rechercher la cause racine (ex. certificat qui expire, charge du lundi), documenter l'erreur connue. 3) Gestion des changements : la correction (augmenter la capacité, remplacer le certificat) est un changement évalué selon valeur et risque : normal (CAB) si risqué, standard si pré-approuvé, urgent (ECAB) si critique. Puis validation, déploiement, revue post-implantation (PIR).</p>
+<p><b>Exemple chiffré.</b> 4 pannes × 25 usagers × 30 min = 50 h perdues par mois : justifie l'investissement du changement (valeur vs coût).</p>
+<p><b>Lien et limite.</b> Lean : le défaut répété est un gaspillage de non-qualité. Amélioration continue : le PIR alimente le registre des améliorations. Limite : sans bonne gestion des configurations, on ne voit pas quels CI sont touchés.</p>`},
+{pts:"25 %",t:"Amélioration continue des services",
+q:`Décrivez l'approche d'amélioration continue d'ITIL en 6 étapes et comparez son application dans un contexte traditionnel et dans un contexte agile. Illustrez par l'amélioration du délai de création de comptes d'un service TI.`,
+a:`<p><b>Étapes.</b> Vision (aligner sur les buts de l'organisation) → où sommes-nous (valeur perçue, compétences, processus, technologies, culture) → où voulons-nous aller (écart, objectifs, indicateurs, priorités) → comment y parvenir → passer à l'action et évaluer l'avancement → conserver l'élan.</p>
+<p><b>Traditionnel vs agile.</b> Traditionnel : plan détaillé (qui, quoi, où, comment, quand), responsable de coordination, suivi par activités et comités, corriger les écarts plan/réel. Agile : cycle itératif qui part de l'action la plus prioritaire, équipe dédiée autogérée, rencontres quotidiennes et démonstration à la fin de l'itération, rétrospective pour l'élan.</p>
+<p><b>Exemple.</b> Vision : onboarder les membres avant leur premier atelier. Point de départ : aucune date d'acceptation enregistrée, comptes créés en lot. Cible : comptes du club en ≤ 7 jours pour 90 % des adhésions. Action : formulaire d'adhésion qui déclenche un ticket, avec date de départ. Suivi : tableau de bord hebdomadaire des délais. Élan : rétrospective après chaque pic d'adhésion.</p>
+<p><b>Lien.</b> SWOT pour prioriser, étude coûts/bénéfices, PDCA ; équivalent de la boucle RDMAIC.</p>`}]});
+
+/* ============ 5. AGILITE ============ */
+M.push({id:"agile",tag:"S05-06",title:"Agilité, Scrum et grande échelle",src:"S05-06 : diapos Agile 5 à 55 · Manifeste · Guide Scrum · XP · SAFe · vidéos Spotify",
+secs:[
+`<div class="grid">
+<div class="card"><h3>Manifeste agile (février 2001)</h3><p>17 spécialistes indépendants. Quatre valeurs, on valorise davantage :</p><ul><li>les individus et leurs interactions que les processus et les outils ;</li><li>un logiciel opérationnel que de la documentation exhaustive ;</li><li>la collaboration avec le client que la négociation contractuelle ;</li><li>la réaction au changement que le suivi d'un plan.</li></ul><p class="hint">+ 12 principes (livraison fréquente, accueillir le changement, équipes motivées, excellence technique, simplicité, rétrospectives…).</p></div>
+<div class="card"><h3>Scrum</h3><ul><li><b>3 rôles</b> : Product Owner (valeur, priorités), équipe de développement (autogérée), Scrum Master (facilite).</li><li><b>5 événements</b> : Sprint (conteneur), Sprint Planning, Daily Scrum, Sprint Review (démonstration), Sprint Retrospective (amélioration).</li><li><b>3 artefacts</b> : Product Backlog, Sprint Backlog, Incrément.</li></ul></div></div>`,
+`<div class="grid">
+<div class="card"><h3>Autres méthodes légères</h3><ul><li><b>Kanban</b> : visualiser le flux, limiter le travail en cours.</li><li><b>XP</b> : pratiques techniques (tests, programmation en paire, intégration continue).</li><li>Agile et Lean : même esprit (valeur, flux, amélioration continue).</li></ul></div>
+<div class="card"><h3>Grande échelle</h3><ul><li><b>Scrum de Scrums</b> : quand plus de neuf personnes doivent coordonner.</li><li><b>SAFe</b>, <b>LeSS</b>, <b>Nexus</b>, <b>modèle Spotify</b> (équipes autonomes, tribus, guildes).</li><li>« Gouverner vers la valeur » : la gouvernance agile fixe la direction, les équipes décident du comment.</li></ul></div>
+<div class="card"><h3>Prédictif vs agile</h3><ul><li>Prédictif : portée fixée tôt, plan détaillé, livraison à la fin.</li><li>Agile : portée qui évolue, livraisons fréquentes, rétroaction du client.</li><li>Choisir selon la stabilité des besoins et le risque.</li></ul></div></div>`,
+`<div class="trap"><h3>Pièges d'examen</h3><ul>
+<li>Dire « Agile = pas de documentation, pas de plan » : le manifeste valorise davantage, il n'exclut pas.</li>
+<li>Faire du Scrum Master un chef de projet : il facilite et retire les obstacles.</li>
+<li>Oublier la rétroaction du client (Sprint Review) et l'amélioration (rétrospective).</li></ul></div>`
+],
+exams:[{pts:"25 %",t:"Agile et Scrum",
+q:`Expliquez les valeurs et principes du manifeste agile, puis décrivez Scrum (rôles, événements, artefacts). Comparez avec une approche prédictive et dites dans quels cas passer à l'échelle (Scrum de Scrums, SAFe, Spotify). Donnez un exemple concret.`,
+a:`<p><b>Définition.</b> Agile : ensemble de méthodes itératives centrées sur la valeur livrée tôt et la rétroaction. Manifeste de 2001 : 4 valeurs et 12 principes.</p>
+<p><b>Scrum.</b> Rôles : PO (backlog, priorités), équipe (développe, s'autogère), Scrum Master (facilite). Événements : Sprint, Planning (objectif et sélection), Daily (synchronisation de 15 min), Review (démo aux parties prenantes), Rétrospective (amélioration du travail). Artefacts : Product Backlog (tout ce qui est voulu, priorisé), Sprint Backlog (plan du sprint), Incrément (résultat utilisable).</p>
+<p><b>Prédictif vs agile.</b> Prédictif quand besoins stables et connus (ex. migration réglementaire à date fixe). Agile quand besoins incertains ou changeants (ex. portail de service pour un club étudiant dont les besoins évoluent à chaque pic d'adhésion).</p>
+<p><b>Grande échelle.</b> Scrum de Scrums au-delà de ~9 personnes ; SAFe pour synchroniser des dizaines d'équipes avec une piste d'architecture ; Spotify (tribus, guildes) pour l'autonomie. Condition : gouvernance qui fixe la direction sans micro-gérer.</p>
+<p><b>Lien et limite.</b> Agile + Lean + DevOps forment une chaîne de valeur continue ; limite : sans architecture et sans gouvernance, plusieurs équipes autonomes créent de la dette technique et des silos.</p>`}]});
+
+/* ============ 6. DEVOPS ============ */
+M.push({id:"devops",tag:"S07-08",title:"DevOps",src:"S07-08 : diapos DevOps 4 à 23 · vidéos DevOps, CI/CD, DevSecOps",
+secs:[
+`<div class="grid">
+<div class="card"><h3>Pourquoi DevOps</h3><p>L'éloignement entre développement (changer vite) et opérations (stabilité) freine le <b>time to market</b>. DevOps n'est ni un cadre, ni un outil, ni une organisation : c'est l'intégration systématique de l'Agilité, du Lean, de la livraison continue et du Toyota Kata.</p></div>
+<div class="card"><h3>CALMS (les 5 piliers)</h3><ul><li><b>C</b>ulture : responsabilité partagée</li><li><b>A</b>utomation : automatiser le plus possible</li><li><b>L</b>ean : flux de valeur visible</li><li><b>M</b>easurement : hypothèses, validation, apprentissage</li><li><b>S</b>haring : partager responsabilités et succès</li></ul></div></div>
+<div class="grid">
+<div class="card"><h3>Trois voies</h3><ol><li><b>Flux</b> : optimiser le flux de valeur du développement à la production.</li><li><b>Rétroaction</b> : boucles courtes et visibles, de la production vers le développement.</li><li><b>Apprentissage continu</b> : l'échec comme occasion d'apprendre.</li></ol></div>
+<div class="card"><h3>Pipeline et pratiques</h3><ul><li><b>Pipeline de livraison</b> : étapes automatisées du développement à la production.</li><li><b>Intégration continue</b> : le travail de chaque équipe est intégré et validé en continu, ce qui réduit les risques.</li><li><b>Déploiement continu</b> : déploiement automatisé dans les environnements de test et de production.</li><li><b>DevSecOps</b> : la sécurité dès le pipeline.</li></ul></div></div>`,
+`<div class="trap"><h3>Pièges d'examen</h3><ul>
+<li>Réduire DevOps à des outils (Jenkins, GitLab CI) : la culture vient d'abord.</li>
+<li>Confondre livraison continue (prêt à déployer) et déploiement continu (déployé automatiquement).</li>
+<li>Oublier le lien avec ITIL : changements standards automatisés et pré-approuvés.</li></ul></div>`
+],
+exams:[{pts:"25 %",t:"DevOps et livraison continue",
+q:`Expliquez ce qu'est DevOps (CALMS, trois voies, pipeline), comment il réduit le time to market et comment il s'articule avec le Lean et la gestion des changements ITIL. Donnez un exemple concret avant/après.`,
+a:`<p><b>Définition.</b> DevOps = collaboration Dev/Ops soutenue par l'automatisation, issue de l'agilité, du Lean et de la livraison continue. Piliers CALMS.</p>
+<p><b>Mécanisme.</b> Voie 1 (flux) : petits lots, pipeline automatisé. Voie 2 (rétroaction) : tests automatiques, surveillance, alertes. Voie 3 (apprentissage) : revues sans blâme, expérimentation. Pipeline : commit → build → tests → préproduction → production, avec intégration et déploiement continus.</p>
+<p><b>Exemple.</b> Avant : livraison trimestrielle manuelle, 40 % d'incidents, 11 semaines de délai. Après : pipeline avec tests, livraisons hebdomadaires de petits lots, retour arrière en minutes, taux d'échec sous 10 %.</p>
+<p><b>Lean et ITIL.</b> Lean : le pipeline élimine l'attente, les stocks et la non-qualité. ITIL : les changements automatisés et éprouvés deviennent <i>standards</i> (pré-approuvés), le CAB se concentre sur les changements majeurs. DevSecOps ajoute la sécurité au pipeline.</p>
+<p><b>Limite.</b> Sans culture de responsabilité partagée, l'outillage ne règle rien ; sans tests fiables, accélérer augmente les pannes.</p>`}]});
+
+/* ============ 7. ARCHI ============ */
+M.push({id:"archi",tag:"S09-10",title:"Architecture d'entreprise : TOGAF et ArchiMate",src:"S09-10 : « Architecture entreprise » diapos 6 à 36 · cas Banque Boréale (principes, FFOM, SMART) · Hydro-Québec 2035",
+secs:[
+`<div class="grid">
+<div class="card"><h3>Rôle de l'architecture d'entreprise</h3><p>Traduire la stratégie d'affaires en exécution technologique cohérente : construire la bonne chose, de la bonne façon. Quatre principes : <b>alignement stratégique</b> (relier le « pourquoi » au « comment »), <b>vision à long terme</b> (éviter silos, redondance, dette technique), <b>gouvernance</b> (cadre qui donne de l'autonomie), <b>évolution</b> intentionnelle.</p></div>
+<div class="card"><h3>TOGAF et l'ADM</h3><ul><li>L'<b>ADM</b> (Architecture Development Method) est un cycle itératif, adaptable.</li><li>Responsabilités de l'architecte : vision d'architecture, piloter l'ADM (affaires, données, applications, technologie), gouverner la mise en œuvre (contrats d'architecture, revues de conformité), gérer le changement.</li><li>Collaborateurs : dirigeants, architectes de domaine, architectes de solutions, gestionnaires de portefeuille.</li></ul></div></div>`,
+`<div class="card"><h3>ArchiMate : TOGAF donne la méthode, ArchiMate la notation</h3>
+<div class="tw"><table><thead><tr><th>Couche</th><th>Éléments</th><th>Exemple Hydro-Québec 2035</th></tr></thead><tbody>
+<tr><td><b>Motivation</b></td><td>Stakeholder, Driver, Assessment, Goal, Outcome, Principle, Requirement, Constraint, Meaning, Value</td><td>Clientèle · transition énergétique et événements climatiques · réseau vulnérable · « améliorer la qualité du service » · réduire les pannes de 35 % · service fiable, simple, abordable · remplacer les poteaux en fin de vie · enveloppe budgétaire</td></tr>
+<tr><td><b>Stratégie</b></td><td>Course of action, Capability, Resource</td><td>Renforcer la pérennité du réseau · gestion des actifs · investissements et travailleurs de lignes</td></tr>
+</tbody></table></div>
+<p class="hint">Chaîne logique : Driver → Assessment → Goal → Outcome (mesurable) → Principle → Requirement (sous Constraint) ; puis Course of action ← Capability ← Resource.</p></div>
+<div class="grid">
+<div class="card"><h3>Profils d'architecte</h3><ul><li>Traditionnel (TOGAF), agile (SAFe), IA, technique.</li><li>Architecte d'entreprise ≠ d'affaires ≠ de solutions.</li></ul></div>
+<div class="card"><h3>Outils d'analyse du cas Banque Boréale</h3><ul><li><b>Principes</b> d'architecture (atelier 1)</li><li><b>FFOM / SWOT</b> : forces, faiblesses, occasions, menaces (atelier 2)</li><li><b>SMART</b> pour les objectifs (atelier 3)</li></ul></div></div>`,
+`<div class="trap"><h3>Pièges d'examen</h3><ul>
+<li>Confondre TOGAF (méthode) et ArchiMate (langage de modélisation).</li>
+<li>Un Outcome sans mesure : il doit être quantifié et lié à un Goal.</li>
+<li>Faire de l'architecture un document figé : l'ADM est itératif.</li></ul></div>`
+],
+exams:[{pts:"25 %",t:"Architecture d'entreprise et modélisation de la motivation",
+q:`Expliquez le rôle de l'architecture d'entreprise et la relation entre TOGAF et ArchiMate. Pour un objectif de votre choix (ex. réduire le délai de création de comptes d'un service TI), modélisez la couche motivation d'ArchiMate en nommant chaque élément et la relation qui les relie.`,
+a:`<p><b>Rôle.</b> L'architecture d'entreprise relie stratégie et exécution TI : alignement, vision à long terme, gouvernance (cadre qui donne de l'autonomie), évolution guidée. TOGAF = méthode (ADM itératif) ; ArchiMate = notation graphique, complémentaire.</p>
+<p><b>Modélisation (exemple club étudiant).</b></p><ul>
+<li><b>Stakeholder</b> : membres de l'équipe de course et chefs d'équipe.</li>
+<li><b>Driver</b> : pic d'adhésions chaque automne et croissance des plateformes.</li>
+<li><b>Assessment</b> : les comptes sont créés en lot, sans date d'acceptation enregistrée (faiblesse).</li>
+<li><b>Goal</b> : intégrer chaque nouveau membre sans délai.</li>
+<li><b>Outcome</b> : 90 % des comptes du club créés en ≤ 7 jours (mesure du Goal).</li>
+<li><b>Principle</b> : une seule source de vérité pour les adhésions.</li>
+<li><b>Requirement</b> : formulaire d'adhésion qui déclenche automatiquement la demande de comptes.</li>
+<li><b>Constraint</b> : budget d'OBNL, bénévoles disponibles.</li>
+<li><b>Value</b> : membres productifs dès leur premier atelier.</li></ul>
+<p>Côté stratégie : Course of action (automatiser l'onboarding), Capability (gestion des accès), Resource (outils, bénévoles).</p>
+<p><b>Lien.</b> TOGAF place cette modélisation dans les phases de vision et d'architecture d'affaires ; l'objectif doit être SMART. Limite : modéliser sans gouvernance de mise en œuvre ne change rien.</p>`}]});
+
+/* ============ 8. CLOUD ============ */
+M.push({id:"cloud",tag:"S11",title:"Infonuagique, FinOps et risques",src:"S11 : « Gestion de l'infonuagique » diapos 4 à 27 · Deloitte 2023 (Canada) · vidéos IaaS/PaaS/SaaS/CaaS/FaaS, Serverless",
+secs:[
+`<div class="grid">
+<div class="card"><h3>Modèles de service</h3><ul><li><b>IaaS</b> : infrastructure (machines virtuelles, réseau, stockage)</li><li><b>PaaS</b> : plateforme pour développer et déployer</li><li><b>SaaS</b> : application complète consommée en service</li><li><b>CaaS</b> : conteneurs</li><li><b>FaaS / serverless</b> : fonctions déclenchées par des événements, facturées à l'usage</li></ul><p class="hint">Plus on monte (IaaS → SaaS), moins on gère, plus on dépend du fournisseur.</p></div>
+<div class="card"><h3>2018 → 2025 : ce qui a changé</h3><p>Le cloud est passé d'une <b>transition à justifier</b> à la <b>norme à gérer</b> : création de valeur, gestion des risques, contrôle des coûts.</p></div></div>`,
+`<div class="tw"><table><thead><tr><th>Étape de la marche à suivre</th><th>2018</th><th>2025</th></tr></thead><tbody>
+<tr><td>1 Apprendre</td><td>Bases du cloud, risques du Shadow IT</td><td><b>FinOps</b>, opportunités et risques de l'IA (Shadow AI : données sensibles envoyées à des API publiques, enjeux Loi 25)</td></tr>
+<tr><td>2 Planifier</td><td>Plan de migration technique (« lift and shift »)</td><td>Aligner la stratégie, plan de création de valeur</td></tr>
+<tr><td>3 Officialiser</td><td>Politiques pour restreindre le Shadow IT</td><td>Gérer les talents (pénurie de main-d'œuvre : 50 % des leaders canadiens selon Deloitte 2023)</td></tr>
+<tr><td>4 Gérer</td><td>Outils d'orchestration, libre-service, coûts de base</td><td>Gouvernance : FinOps (coûts attribués aux unités d'affaires) et SecOps (Zero Trust)</td></tr>
+<tr><td>5 Développer</td><td>Expérimenter (DevOps), métrique : vélocité de déploiement</td><td>Quantifier la valeur d'affaires</td></tr>
+</tbody></table></div>
+<div class="grid">
+<div class="card"><h3>Les vrais pièges de 2025</h3><ul><li><b>Choc FinOps</b> : le « paiement à l'usage » est un piège sans gouvernance.</li><li><b>Risque systémique</b> : dépendance au fournisseur devenue risque de chaîne d'approvisionnement (panne AWS, CrowdStrike).</li><li><b>Conflit de souveraineté</b> : Loi 25 vs CLOUD Act, qui force des choix d'architecture (nuage souverain).</li></ul></div>
+<div class="card"><h3>Chiffres Deloitte 2023 (diapos)</h3><ul><li>81 % des leaders canadiens sont optimistes face à l'IA générative.</li><li>91 % voient dans les nuages sectoriels un accélérateur.</li><li>50 % citent la pénurie de main-d'œuvre comme obstacle majeur.</li></ul></div></div>`,
+`<div class="trap"><h3>Pièges d'examen</h3><ul>
+<li>Présenter le cloud comme une économie automatique : sans FinOps, le coût dérive.</li>
+<li>Ignorer la responsabilité partagée : le fournisseur sécurise l'infrastructure, toi les données, les accès et la configuration.</li>
+<li>Parler de « sécurité » sans nommer le risque précis (Shadow AI, fuite, souveraineté, dépendance).</li></ul></div>`
+],
+exams:[{pts:"25 %",t:"Infonuagique : avantages, pièges et démarche",
+q:`Comparez les avantages et les pièges de l'infonuagique en 2018 et en 2025. Décrivez la démarche de gestion en cinq étapes et illustrez-la par une organisation de votre choix qui a migré des services vers le nuage sans gouvernance.`,
+a:`<p><b>Définition.</b> Cloud : ressources TI à la demande (IaaS, PaaS, SaaS, CaaS, FaaS). Avantages 2018 : peu d'investissement initial, adaptabilité, innovation. En 2025 : norme à gérer.</p>
+<p><b>Pièges 2018 → 2025.</b> Dépendance fournisseur → risque systémique (panne de grand fournisseur) ; sécurité et confidentialité → Shadow AI et fuites ; conformité → conflit Loi 25 vs CLOUD Act ; intégration hybride → coûts et complexité ; coût minimal → choc FinOps.</p>
+<p><b>Démarche en 5 étapes.</b> Apprendre (FinOps, IA) → Planifier (aligner stratégie et création de valeur) → Officialiser/capacités (talents) → Gérer (FinOps et SecOps, Zero Trust) → Développer/quantifier la valeur d'affaires.</p>
+<p><b>Exemple.</b> PME dont la facture cloud double en un an après des migrations par équipe, sans balises de coûts : on applique l'étiquetage des ressources par unité d'affaires, des budgets avec alertes (FinOps), l'inventaire des outils d'IA utilisés (Shadow AI), le choix de l'hébergement des données personnelles selon la Loi 25.</p>
+<p><b>Lien et limite.</b> Lien avec ITIL (fournisseurs, niveaux de service), DevOps (FaaS, DevSecOps) et RDMAIC (mesurer l'écart de coûts). Limite : la valeur doit être démontrée (« ce que ça rapporte »), pas seulement la vitesse de déploiement.</p>`}]});
+
+/* ============ 9. IMPARTITION & CYBER ============ */
+M.push({id:"impart",tag:"S11",title:"Impartition et cybersécurité",src:"S09-10 (pratique Fournisseurs) · S11 (Deloitte 2024 impartition mondiale, Cyber Kill Chain, DevSecOps)",
+secs:[
+`<div class="grid">
+<div class="card"><h3>Façons de fournir un service</h3><ul><li><b>Insourcing</b> : réaliser à l'interne</li><li><b>Outsourcing</b> : réaliser à l'externe (substitution de l'interne)</li><li><b>Partenariat</b> : source unique avec relation et intégration plus fortes</li><li><b>Multi-sourcing</b> : plusieurs sources</li></ul></div>
+<div class="card"><h3>Pratique « Fournisseurs » (ITIL)</h3><ul><li>Optimiser ressources et contrats</li><li>Aligner les contrats sur les besoins d'affaires</li><li>Gérer relations et performance</li><li>Négocier et gérer le cycle de vie des contrats</li><li>Maintenir une base de données fournisseurs et contrats</li></ul></div></div>
+<div class="grid">
+<div class="card"><h3>Choisir un mode de sourcing</h3><ul><li>Cœur de métier / différenciant → garder à l'interne.</li><li>Commodité (courriel, paie) → externe.</li><li>Critères : coût total, risque, compétences, dépendance, conformité (lieu des données), capacité de sortie.</li></ul></div>
+<div class="card"><h3>Cyber Kill Chain (7 étapes)</h3><ol><li>Reconnaissance</li><li>Armement</li><li>Livraison</li><li>Exploitation</li><li>Installation</li><li>Commande et contrôle</li><li>Actions sur les objectifs</li></ol><p class="hint">Plus tôt on interrompt la chaîne, moins le dommage est grand (défense en profondeur).</p></div></div>
+<div class="card"><h3>DevSecOps et sécurité de l'information</h3><p>Intégrer la sécurité dans le pipeline (analyse de code, de dépendances, de conteneurs) plutôt qu'à la fin. La pratique ITIL « Sécurité de l'information » s'appuie sur ISO/IEC 27000 ; la pratique « Risques » sur ISO 31000. Zero Trust : ne jamais faire confiance par défaut, vérifier continuellement.</p></div>`,
+`<div class="trap"><h3>Pièges d'examen</h3><ul>
+<li>Croire qu'on externalise aussi la responsabilité : l'organisation reste responsable de ses données et de ses clients.</li>
+<li>Ne pas prévoir la sortie du contrat (réversibilité).</li>
+<li>Réciter la Kill Chain sans donner une contre-mesure par étape.</li></ul></div>`
+],
+exams:[{pts:"25 %",t:"Impartition et chaîne d'attaque",
+q:`Comparez insourcing, outsourcing, partenariat et multi-sourcing et expliquez comment une organisation choisit et pilote ses fournisseurs. Puis présentez la Cyber Kill Chain et indiquez une contre-mesure pour chaque étape, avec un exemple concret.`,
+a:`<p><b>Modes.</b> Interne (contrôle, mais coût et compétences), externe (spécialisation, coût variable, mais dépendance), partenariat (relation étroite, risque de captivité), multi-sourcing (réduit la dépendance, plus de coordination).</p>
+<p><b>Choix et pilotage.</b> Selon la nature du service (cœur de métier ou commodité), le coût total, le risque, la conformité (lieu des données) et la capacité de sortie. Pilotage : contrats alignés sur les besoins d'affaires, niveaux de service mesurés, revues de performance, base de données des fournisseurs, clause de réversibilité.</p>
+<p><b>Cyber Kill Chain et contre-mesures.</b> Reconnaissance (limiter l'information publique) · Armement (veille de menaces) · Livraison (filtrage courriel, formation à l'hameçonnage) · Exploitation (correctifs, moindre privilège) · Installation (antiprogramme malveillant, liste blanche) · Commande et contrôle (filtrage du trafic sortant, segmentation) · Actions sur les objectifs (chiffrement, sauvegardes hors ligne, détection d'exfiltration).</p>
+<p><b>Exemple.</b> Courriel d'hameçonnage contre un trésorier de club : la formation et l'authentification multifacteur coupent la chaîne dès la livraison/exploitation ; sans elles, le gestionnaire de mots de passe compromis donne accès à toutes les plateformes.</p>
+<p><b>Lien.</b> Cloud : responsabilité partagée ; DevSecOps ; continuité (BIA, plans de reprise).</p>`}]});
+
+/* ============ NIVEAU 2 : examens plus difficiles ============ */
+function addExam(id,e){e.lvl=2;M.find(function(m){return m.id===id}).exams.push(e)}
+
+addExam("rdmaic",{pts:"50 %",t:"Cas : Intégration des employés au Cabinet Delorme",
+q:`Cas fictif. Le Cabinet Delorme (comptabilité, 60 employés) engage environ 120 personnes par an, dont 70 en janvier et février (stagiaires de la saison fiscale). L'intégration TI promet « poste prêt en 2 jours » mais prend en moyenne 9 jours. Quatre systèmes sont créés par trois personnes différentes (courriel, ERP, VPN, téléphonie). Les gestionnaires remplissent un formulaire papier et personne n'enregistre la date de la demande. Un audit interne a trouvé que 22 % des comptes avaient des droits inadéquats. Contraintes : aucun budget pour un nouvel outil, résultats attendus en 3 mois, avant la prochaine saison fiscale.
+
+Appliquez la démarche RDMAIC. Traitez en particulier : (a) comment mesurer sans données de départ, (b) les objectifs en tension (vitesse et sécurité), (c) les solutions possibles sans budget, (d) comment vous éviterez que le gain disparaisse après la saison.`,
+a:`<p><b>R.</b> Problème : promesse de 2 jours non tenue (9 jours) et risque de sécurité (22 % de droits inadéquats). Parties prenantes : nouveaux employés, gestionnaires, 3 intervenants TI, direction, vérificateurs. Observer le parcours réel d'une arrivée (gemba).</p>
+<p><b>D.</b> Deux indicateurs liés, donc deux volets SMART : « Ramener le délai d'intégration de 9 à 3 jours ouvrables ou moins pour 90 % des arrivées, <i>et</i> faire passer les comptes avec droits corrects de 78 % à 98 % ou plus, avant la saison fiscale (3 mois). » Expliquer la tension : on n'accélère pas en retirant les contrôles ; on rend les droits standard par rôle. FIPEC : fournisseur (gestionnaire demandeur), intrant (formulaire), processus (demande, création ×4 systèmes, vérification), extrant (poste prêt avec bons droits), client (nouvel employé).</p>
+<p><b>(a) M – Mesurer sans données.</b> Reconstituer une base de départ : échantillon rétrospectif des 20 dernières arrivées (dates d'embauche vs première connexion, courriels de confirmation, journaux de création des comptes), entrevues avec les trois intervenants pour estimer temps actif vs attente. Dès maintenant, enregistrer la date de la demande (nouvelle donnée). Cartographie en couloirs, lead time vs temps actif, nombre de passations. Dire la limite de l'échantillon et du biais de mémoire.</p>
+<p><b>A.</b> Ishikawa : <i>Méthode</i> (création séquentielle par 3 personnes, droits copiés d'un collègue), <i>Matière</i> (formulaire papier, informations manquantes), <i>Main-d'œuvre</i> (aucun responsable de bout en bout), <i>Milieu</i> (pic de 58 % des arrivées en deux mois), <i>Matériel</i> (aucun registre de rôles). 5 Pourquoi sur les droits inadéquats : on copie le profil d'un collègue → pas de profils par rôle → personne n'est propriétaire des rôles → aucun processus de revue. Gaspillages : attente, transport (passations), défauts (droits erronés), mouvements, surproduction de profils sur mesure.</p>
+<p><b>I – Sans budget.</b> Formulaire électronique avec champs obligatoires (outil déjà possédé : formulaire de la suite bureautique), <b>modèles de droits par rôle</b> (changement <i>standard</i> pré-approuvé), liste de contrôle unique, un propriétaire de bout en bout, création parallèle des quatre comptes, préparation anticipée des stagiaires (pic prévisible) via un lot planifié. Pilote avec les arrivées de novembre. Changement humain : former les gestionnaires, expliquer le « pourquoi » (sécurité).</p>
+<p><b>C – (d) Maintenir.</b> Tableau de bord mensuel (délai, % de droits corrects), revue trimestrielle des rôles par les gestionnaires, audit d'échantillon, procédure standardisée et propriétaire nommé, retour d'expérience après la saison fiscale (PDCA). Planifier la suite : automatisation quand le budget le permet.</p>
+<p class="hint">Points qui rapportent : traiter explicitement l'absence de données, la tension vitesse/sécurité par des rôles standards, des solutions réalistes sans budget, un plan de maintien après le pic.</p>`});
+
+addExam("rdmaic",{pts:"50 %",t:"Cas : Application de livraison Express-Nord et facture infonuagique",
+q:`Cas fictif. Express-Nord (application de livraison, 25 développeurs) a migré vers le nuage il y a un an. La facture mensuelle a augmenté de 85 % en six mois sans hausse équivalente d'usage. Chaque équipe crée ses propres ressources, plusieurs environnements de test tournent 24 h sur 24, et trois incidents de lenteur ont touché les clients au dernier trimestre. Un développeur a connecté des données de clients du Québec à un service d'IA public pour tester une recommandation. La direction craint la facture et un incident de confidentialité. Elle demande un plan en 8 semaines.
+
+Appliquez la démarche RDMAIC. Précisez les indicateurs, les causes racines, vos solutions (FinOps et gouvernance) et votre plan de contrôle.`,
+a:`<p><b>R.</b> Deux problèmes liés : coûts hors contrôle (+85 %) et risque de gouvernance des données (Shadow AI, Loi 25), plus la qualité de service (3 incidents). Parties prenantes : direction, finances, développeurs, clients, responsable de la protection des renseignements personnels.</p>
+<p><b>D.</b> SMART : « Réduire la facture mensuelle de 25 % sans baisse de disponibilité, atteindre 100 % des ressources étiquetées par équipe et zéro donnée personnelle envoyée à un service d'IA non approuvé, d'ici 8 semaines. » Périmètre : tous les comptes cloud de production et de test.</p>
+<p><b>M.</b> Rapport de coûts par service et par équipe, % de ressources sans étiquette, heures d'utilisation des environnements de test, taux d'utilisation du processeur (ressources surdimensionnées), inventaire des outils d'IA utilisés (sondage + journaux réseau), indicateurs d'incident (durée, nombre). Cartographier le cycle de création d'une ressource.</p>
+<p><b>A.</b> Ishikawa : <i>Méthode</i> (aucune politique de création, pas de revue des coûts), <i>Matériel</i> (ressources surdimensionnées, environnements actifs en continu), <i>Main-d'œuvre</i> (aucune compétence FinOps, développeurs sans formation Loi 25), <i>Matière</i> (données réelles utilisées en test), <i>Milieu</i> (culture « livrer vite »). 5 Pourquoi : facture qui explose → ressources oubliées → pas d'étiquettes ni de propriétaire → pas de gouvernance → l'avantage du « paiement à l'usage » a été vu comme gratuit. Gaspillages : stocks (ressources dormantes), surproduction (capacité inutilisée), attente (lenteurs), défauts.</p>
+<p><b>I.</b> FinOps : étiquetage obligatoire, budgets et alertes par équipe, extinction automatique des environnements de test hors des heures de travail (gain direct), redimensionnement, engagements d'usage pour la charge stable. Gouvernance : politique d'usage des outils d'IA (liste approuvée, interdiction des données personnelles), environnements de test avec données anonymisées, évaluation de l'hébergement des données (Loi 25 vs CLOUD Act). SecOps : accès au moindre privilège. Plan en 3 jalons (semaines 1-2 visibilité, 3-5 économies rapides, 6-8 politiques).</p>
+<p><b>C.</b> Tableau de bord FinOps hebdomadaire, revue mensuelle des coûts par équipe avec propriétaire, vérification trimestrielle de conformité, formation continue, indicateurs de valeur d'affaires (coût par livraison). PDCA.</p>`});
+
+addExam("gouv",{pts:"25 %",t:"Gouvernance d'un projet de migration (niveau 2)",
+q:`Le conseil d'administration d'une université reçoit un projet de migration de 2 M$ du système d'inscription vers un service infonuagique. Un administrateur demande : « Qu'est-ce que nous devons exiger et surveiller en tant que conseil ? » À l'aide des principes de la norme ISO/IEC 38500, du modèle évaluer-diriger-surveiller, et des notions d'utilité et de garantie, formulez les questions que le conseil doit poser et distinguez ce qui relève de la gouvernance de ce qui relève de la gestion.`,
+a:`<p><b>Cadre.</b> ISO/IEC 38500 : six principes — responsabilité, stratégie, acquisition, performance, conformité, comportement humain. Cycle : <b>évaluer</b> les options, <b>diriger</b> (approuver et donner les consignes), <b>surveiller</b> (résultats et conformité).</p>
+<p><b>Questions du conseil (par principe).</b> Responsabilité : qui est le propriétaire du projet et des données ? Stratégie : en quoi la migration soutient la stratégie de l'université ? Acquisition : le choix du fournisseur est-il justifié (coût total, risques, réversibilité) ? Performance : quel niveau de garantie (disponibilité en période d'inscription, capacité, continuité) est exigé et comment est-il mesuré ? Conformité : où les données personnelles sont-elles hébergées (Loi 25, CLOUD Act), quelles obligations de sécurité (ISO 27000) ? Comportement humain : l'impact sur les employés et étudiants est-il géré (formation, résistance) ?</p>
+<p><b>Valeur.</b> Le service peut avoir toute l'utilité (inscription en ligne) et détruire de la valeur si la garantie est faible (panne le jour des inscriptions). Co-création : l'université et le fournisseur créent la valeur ensemble, d'où l'importance des niveaux de service et des relations.</p>
+<p><b>Gouvernance vs gestion.</b> Conseil : approuver l'investissement, fixer les risques acceptables, exiger des rapports. Gestion : plan de migration, pilotage du fournisseur (ITIL fournisseurs, niveaux de service), gestion des changements, continuité, tests. Cadres : COBIT pour structurer objectifs et mesures, ITIL/ISO 20000 pour les services, ISO 31000 pour les risques.</p>
+<p><b>Limite.</b> Un conseil qui surveille trop dans le détail fait de la gestion ; un conseil qui n'exige aucun indicateur ne fait pas de gouvernance.</p>`});
+
+addExam("lean",{pts:"25 %",t:"Flux, takt time et efficacité (niveau 2, avec calculs)",
+q:`Le processus de demande de changement d'une organisation prend en moyenne 14 jours ouvrables du dépôt de la demande à la mise en œuvre. Le temps de travail réel cumulé (analyse, approbation, test, mise en œuvre) est de 1,5 jour ouvrable. L'organisation reçoit 480 demandes par mois (20 jours ouvrables), traitées par 3 analystes disponibles 7 heures par jour. Le travail actif moyen est de 45 minutes par demande.
+(a) Calculez l'efficacité du flux et le takt time d'équipe, puis commentez.
+(b) Identifiez au moins cinq gaspillages probables et un moyen de réduire chacun.
+(c) Expliquez pourquoi un système tiré avec limite de travail en cours améliorerait le délai.`,
+a:`<p><b>(a) Calculs.</b> Efficacité du flux = temps actif ÷ lead time = 1,5 ÷ 14 ≈ <b>10,7 %</b> : près de 90 % du délai est de l'attente. Demande = 480 ÷ 20 = <b>24 demandes/jour</b>. Temps disponible = 3 × 7 h = 21 h = 1 260 min/jour. Takt time d'équipe = 1 260 ÷ 24 = <b>52,5 min par demande</b>. Le travail actif (45 min) est inférieur au takt : la capacité suffit (charge ≈ 1 080 ÷ 1 260 ≈ 86 %). Donc le problème n'est pas le manque de personnel mais l'attente et l'organisation du flux. Attention : à 86 % de charge, toute variation crée des files (peu de marge).</p>
+<p><b>(b) Gaspillages.</b> Attente : approbations en comité hebdomadaire → changements standards pré-approuvés. Stocks : demandes en file sans priorité → file visible (Kanban). Transport : passations entre équipes → équipe pluridisciplinaire. Défauts : changements renvoyés pour information manquante → formulaire à champs obligatoires. Traitements inutiles : approbations multiples pour des changements à faible risque → autorité déléguée selon le type de changement. Sous-utilisation : analystes qui rédigent des rapports → automatiser.</p>
+<p><b>(c) Système tiré et WIP.</b> Un système tiré ne commence une demande que s'il y a de la capacité : on évite l'accumulation de travail en cours, qui allonge le lead time (le temps passé dans les files). Limiter le WIP rend visibles les goulots, force à résoudre les blocages et rapproche le flux du takt. Lien : DevOps (flux de valeur) et ITIL (types de changement).</p>`});
+
+addExam("itil",{pts:"25 %",t:"Changement d'urgence et incident majeur (niveau 2)",
+q:`Un vendredi à 16 h, le pare-feu d'une entreprise reçoit un correctif de sécurité urgent. Le correctif est appliqué sans passer par le comité de changements. À 17 h, le service de paie devient inaccessible : la paie des employés est due lundi. L'entreprise n'a pas de plan de continuité testé pour la paie, et l'inventaire des configurations est incomplet.
+Analysez la situation avec les pratiques ITIL : types de changement, incident majeur, rôle du problème, gestion des configurations, continuité (BIA), et amélioration continue. Proposez des mesures pour que cela ne se reproduise pas.`,
+a:`<p><b>Changement.</b> Un correctif de sécurité critique peut justifier un changement <b>urgent</b>, mais il suit un circuit accéléré : évaluation par l'ECAB, plan de retour arrière, communication, validation minimale. L'appliquer « sans passer par personne » est un contournement. Le risque (panne de paie) devait être évalué ; un changement <i>standard</i> aurait pu exister si le type était récurrent et connu.</p>
+<p><b>Incident majeur.</b> La paie inaccessible a un impact extrême : procédure distincte, délais plus courts, coordination (responsable de l'incident majeur), communication aux parties prenantes, retour arrière du changement comme première option de rétablissement. La première question est « qu'est-ce qui a changé ? » (lien incident–changement).</p>
+<p><b>Problème.</b> Après le rétablissement, ouvrir un problème pour la cause racine (le correctif incompatible, le manque de test, la dépendance non connue). Documenter une erreur connue avec contournement.</p>
+<p><b>Configurations.</b> L'inventaire incomplet (CMS) empêche de savoir quels services dépendent du pare-feu : l'analyse d'impact du changement était donc aveugle. Il faut relier les CI du pare-feu aux services de paie et aux flux.</p>
+<p><b>Continuité.</b> Réaliser une BIA : la paie est une fonction vitale, avec un temps de reprise exigé ; élaborer et tester un plan de reprise (cibles, lieu, procédure). La date d'échéance du lundi aurait dû être connue du calendrier des changements.</p>
+<p><b>Amélioration continue.</b> Revue post-implantation (PIR), registre des améliorations, priorisation (SWOT, coûts/bénéfices), PDCA. Mesures : calendrier de changements avec périodes de gel avant la paie, test en préproduction, retour arrière documenté, inventaire à jour, test annuel du plan de continuité.</p>`});
+
+addExam("agile",{pts:"25 %",t:"Diagnostic d'une équipe Scrum en difficulté (niveau 2)",
+q:`Une équipe de 14 personnes dit faire du Scrum. Le Daily Scrum dure 40 minutes, le Product Owner est présent un jour sur deux, la Sprint Review se fait sans les utilisateurs, les rétrospectives sont annulées « faute de temps » et la vélocité baisse depuis trois sprints. L'organisation compte 5 équipes qui dépendent les unes des autres.
+(a) Diagnostiquez les problèmes en citant les rôles, événements et artefacts concernés.
+(b) Proposez des corrections concrètes.
+(c) Expliquez à quel moment un Scrum de Scrums ou SAFe devient pertinent, et si Kanban conviendrait mieux à un centre de services.`,
+a:`<p><b>(a) Diagnostic.</b> Équipe de 14 : trop grande pour l'autogestion et le Daily (Scrum suppose une petite équipe ; au-delà d'environ neuf personnes on coordonne par Scrum de Scrums). Daily de 40 min : devient une réunion de statut au lieu d'une synchronisation courte. PO peu disponible : le Product Backlog n'est pas raffiné, les priorités manquent, les décisions bloquent. Review sans utilisateurs : aucune rétroaction réelle sur l'Incrément. Rétrospectives annulées : plus d'amélioration continue, d'où la baisse de vélocité. Dépendances entre 5 équipes : besoin de coordination.</p>
+<p><b>(b) Corrections.</b> Scinder en deux équipes de 6-7 avec un backlog clair ; Daily de 15 min, centré sur l'objectif du sprint et les obstacles ; PO dédié (ou délégué avec pouvoir de décision) ; inviter 2-3 utilisateurs à la Review ; rétrospective non négociable avec 1-2 actions suivies au sprint suivant ; le Scrum Master retire les obstacles. Mesurer : valeur livrée, satisfaction, délai de réponse du PO plutôt que la seule vélocité.</p>
+<p><b>(c) Échelle et Kanban.</b> Scrum de Scrums : quelques équipes à synchroniser (représentants, dépendances). SAFe, LeSS, Nexus : nombreuses équipes, besoin d'architecture, de gouvernance et de planification commune. Modèle Spotify : autonomie par tribus et guildes quand la culture le permet. Un centre de services, au travail imprévisible et continu, convient souvent mieux à <b>Kanban</b> (flux tiré, limite de WIP, pas de sprint fixe) ; Scrum convient aux projets d'amélioration planifiés.</p>
+<p><b>Lien.</b> Ces symptômes sont des gaspillages Lean (attente, défauts, sous-utilisation) ; la gouvernance agile « vers la valeur » exige des indicateurs de valeur, pas de vélocité seulement.</p>`});
+
+addExam("devops",{pts:"25 %",t:"Concevoir un pipeline sous contrainte réglementaire (niveau 2)",
+q:`Une application de paie doit être mise à jour chaque semaine, mais elle est soumise à des exigences de conformité (séparation des tâches, traçabilité, tests de sécurité obligatoires). L'équipe veut du « déploiement continu » mais l'auditeur s'inquiète.
+(a) Concevez un pipeline en indiquant où placer les tests, les contrôles de sécurité et les approbations.
+(b) Distinguez livraison continue et déploiement continu et recommandez un choix.
+(c) Choisissez une stratégie de déploiement et les indicateurs de suivi, et reliez le tout aux trois voies, à CALMS et à la gestion des changements ITIL.`,
+a:`<p><b>(a) Pipeline.</b> Commit (revue par un pair) → build → tests unitaires → analyse statique et des dépendances (DevSecOps) → tests d'intégration → déploiement en préproduction identique à la production → tests de sécurité et de performance → <b>approbation</b> → production → surveillance et vérification. Tout est journalisé automatiquement (traçabilité), les approbations sont enregistrées par le pipeline (preuve pour l'auditeur) et la séparation des tâches est appliquée par des droits distincts (qui écrit le code n'approuve pas son déploiement).</p>
+<p><b>(b) Livraison vs déploiement.</b> Livraison continue : chaque version validée est <i>prête</i> à être déployée, la décision finale reste humaine. Déploiement continu : tout ce qui passe les tests part automatiquement en production. Recommandation ici : <b>livraison continue avec approbation automatisée selon le risque</b> (changements standards pré-approuvés pour les petits changements testés, approbation humaine pour les changements sensibles), ce qui répond à l'auditeur sans perdre la cadence.</p>
+<p><b>(c) Stratégie et indicateurs.</b> Déploiement canari ou bleu-vert avec retour arrière rapide. Indicateurs : fréquence de déploiement, lead time, taux d'échec des changements, temps de rétablissement. Trois voies : flux (pipeline en petits lots), rétroaction (tests, alertes, surveillance), apprentissage (revues post-incident sans blâme). CALMS : culture de responsabilité partagée avec la conformité, automatisation, Lean, mesure, partage. ITIL : l'automatisation transforme des changements en <b>changements standards</b>, le CAB se concentre sur les changements majeurs.</p>
+<p><b>Limite.</b> L'automatisation ne remplace pas la gouvernance : la conformité devient du « code » (contrôles dans le pipeline) plutôt qu'une étape manuelle tardive.</p>`});
+
+addExam("archi",{pts:"25 %",t:"Motivation et stratégie d'une université (niveau 2)",
+q:`Extrait fictif du plan 2030 d'une université : « Le manque de main-d'œuvre en TI s'aggrave. Nous constatons que 28 % des étudiants de première année en TI abandonnent. Notre priorité est d'améliorer la persévérance. Nous visons un taux d'abandon sous 15 % d'ici 5 ans. Nous offrirons un accompagnement personnalisé. Nous devons embaucher 12 conseillers pédagogiques et déployer un portail de suivi, dans une enveloppe de 6 M$. »
+(a) Classez chaque élément dans la couche motivation d'ArchiMate (Stakeholder, Driver, Assessment, Goal, Outcome, Principle, Requirement, Constraint).
+(b) Ajoutez la couche stratégie (Course of action, Capability, Resource).
+(c) Nommez trois erreurs fréquentes de modélisation et expliquez le lien avec TOGAF.`,
+a:`<p><b>(a) Motivation.</b> Stakeholder : étudiants de première année en TI, employeurs. Driver : manque de main-d'œuvre en TI. Assessment : 28 % d'abandon en première année (faiblesse). Goal : améliorer la persévérance. Outcome : taux d'abandon sous 15 % d'ici 5 ans (mesure du Goal). Principle : accompagnement personnalisé. Requirement : embaucher 12 conseillers et déployer un portail de suivi. Constraint : enveloppe de 6 M$.</p>
+<p><b>(b) Stratégie.</b> Course of action : programme d'accompagnement personnalisé des étudiants à risque. Capability : capacité de suivi et d'intervention précoce. Resource : 12 conseillers, portail de suivi, budget.</p>
+<p><b>(c) Erreurs fréquentes.</b> 1) Confondre Goal et Outcome : le Goal est l'intention (« améliorer la persévérance »), l'Outcome est le résultat mesurable (« moins de 15 % »). 2) Mettre un Requirement sans le relier à un Goal ou à une Constraint : chaque exigence doit réaliser un but et respecter une contrainte. 3) Oublier le Driver et l'Assessment, donc modéliser des solutions sans justification. On peut ajouter : mélanger Principle (ligne directrice) et Requirement (action nécessaire).</p>
+<p><b>Lien TOGAF.</b> TOGAF (ADM) donne la méthode : vision, architecture d'affaires, données, applications, technologie, planification de la migration, gouvernance de la mise en œuvre. ArchiMate sert à documenter les résultats à chaque phase. L'architecte vérifie que les projets (portail, embauches) respectent l'architecture cible via des contrats et revues de conformité. L'objectif doit être SMART.</p>`});
+
+addExam("cloud",{pts:"25 %",t:"Décision d'hébergement et calcul FinOps (niveau 2)",
+q:`Un réseau de cliniques doit héberger des dossiers de santé. Option A : machines virtuelles (IaaS) gérées par l'équipe. Option B : application SaaS d'un fournisseur étranger. Option C : nuage souverain canadien. Parallèlement, l'environnement de formation (40 machines virtuelles à 0,20 $ de l'heure) tourne 24 h sur 24, 730 heures par mois, alors qu'il n'est utilisé que 10 heures par jour, 21,7 jours par mois.
+(a) Calculez le coût mensuel actuel, le coût avec extinction automatique hors usage et l'économie en pourcentage.
+(b) Comparez les options A, B, C selon contrôle, responsabilité, conformité (Loi 25, CLOUD Act), risque de dépendance et coût.
+(c) Décrivez la gouvernance minimale à instaurer (FinOps, SecOps, Shadow AI).`,
+a:`<p><b>(a) Calcul.</b> Actuel : 40 × 0,20 $ × 730 h = <b>5 840 $/mois</b>. Avec extinction : usage = 10 h × 21,7 j = 217 h → 40 × 0,20 $ × 217 = <b>1 736 $/mois</b>. Économie = 5 840 − 1 736 = 4 104 $, soit <b>≈ 70 %</b>. Remarque : ajouter le coût du stockage conservé. C'est l'illustration du « paiement à l'usage » qui devient un piège sans gouvernance.</p>
+<p><b>(b) Comparaison.</b> A (IaaS) : contrôle élevé, mais l'organisation gère système, sécurité, correctifs, sauvegardes ; responsabilité partagée (le fournisseur sécurise l'infrastructure, vous le reste). B (SaaS étranger) : le moins de gestion, mais données potentiellement soumises à la loi étrangère (CLOUD Act), forte dépendance au fournisseur et difficulté de sortie ; la Loi 25 impose des obligations sur les renseignements personnels (évaluation des facteurs relatifs à la vie privée pour les transferts hors Québec). C (nuage souverain) : réduit le conflit juridique (Loi 25 vs CLOUD Act), souvent plus coûteux ou moins riche en fonctionnalités. Recommandation raisonnable pour des dossiers de santé : C, ou A/B avec hébergement canadien et chiffrement géré par la clinique, selon le coût et la capacité de l'équipe.</p>
+<p><b>(c) Gouvernance minimale.</b> FinOps : étiquetage, budgets et alertes, revue mensuelle, extinction automatique. SecOps : moindre privilège, Zero Trust, journalisation, gestion des accès. Shadow AI : liste d'outils d'IA approuvés, interdiction d'y envoyer des données de santé, formation. Aussi : plan de sortie du fournisseur, contrat avec niveaux de service, plan de continuité, et démonstration de la valeur d'affaires.</p>`});
+
+addExam("impart",{pts:"25 %",t:"Rançongiciel chez un fournisseur infogéré (niveau 2)",
+q:`Une organisation a confié à un fournisseur l'infogérance de ses serveurs (outsourcing). Le fournisseur subit un rançongiciel qui chiffre des données de l'organisation, dont des renseignements personnels. L'attaque a commencé par un courriel d'hameçonnage reçu par un employé du fournisseur. L'organisation n'a pas de plan de reprise testé et le contrat ne prévoit pas de clause de sortie.
+(a) Placez l'attaque dans la Cyber Kill Chain et indiquez une contre-mesure par étape.
+(b) Que doit prévoir le contrat et comment l'organisation pilote-t-elle ce fournisseur ?
+(c) Comment la continuité (BIA, objectifs de reprise) et les obligations légales (Loi 25) s'appliquent-elles ?`,
+a:`<p><b>(a) Kill Chain.</b> Reconnaissance : l'attaquant repère les employés du fournisseur (limiter l'information publique). Armement : pièce jointe ou lien piégé (veille de menaces). Livraison : courriel d'hameçonnage (filtrage, formation, signalement). Exploitation : l'employé ouvre la pièce (correctifs, moindre privilège, authentification multifacteur). Installation : le rançongiciel s'installe (liste blanche, antiprogramme malveillant). Commande et contrôle : communication avec l'attaquant (filtrage du trafic sortant, segmentation). Actions sur les objectifs : chiffrement et vol de données (sauvegardes hors ligne, détection d'exfiltration). Plus tôt on coupe la chaîne, moins le dommage est grand.</p>
+<p><b>(b) Contrat et pilotage.</b> Niveaux de service mesurables, exigences de sécurité (ISO 27000, certifications), obligation de notification d'incident dans un délai court, droit d'audit, clauses de réversibilité et de sortie, responsabilité financière, sous-traitants autorisés, lieu des données. Pilotage : revues de performance, tests d'hameçonnage, plan de risques, base de données des fournisseurs et contrats, et réflexion sur le multi-sourcing pour limiter la dépendance. L'organisation reste responsable de ses données même si elle impartit.</p>
+<p><b>(c) Continuité et Loi 25.</b> BIA : établir quels services sont vitaux et le temps de reprise maximal acceptable ; en déduire plan de reprise, sauvegardes isolées et tests réguliers. Loi 25 : un incident de confidentialité touchant des renseignements personnels doit être consigné et, s'il présente un risque de préjudice sérieux, signalé à la Commission d'accès à l'information et aux personnes concernées ; le registre des incidents et un responsable désigné sont requis.</p>
+<p><b>Lien et limite.</b> Gouvernance des risques (ISO 31000), DevSecOps, cloud (responsabilité partagée). Limite : un contrat sans exercice de reprise réel ne protège pas.</p>`});
+
+var LINKS=[{"g": "Démarche RDMAIC", "items": [{"n": "Démarche d'amélioration RDMAIC", "u": "https://prezi.com/mxkj8ztob04s/rdmaic/"}, {"n": "DMAIC - Vidéo 1 - Introduction", "u": "https://www.youtube.com/watch?v=G42z2QFDkcE"}, {"n": "DMAIC - Vidéo 2 - Phase DÉFINIR", "u": "https://www.youtube.com/watch?v=6awHngrx64s"}, {"n": "DMAIC - Vidéo 3 - Phase MESURE", "u": "https://www.youtube.com/watch?v=luS037REuSA"}, {"n": "DMAIC - Vidéo 4 - Phase ANALYSE", "u": "https://www.youtube.com/watch?v=Jys402BRl9E&t=7s"}, {"n": "DMAIC - Vidéo 5 - Phase INNOVATION", "u": "https://www.youtube.com/watch?v=KSpDRF54mqQ"}, {"n": "DMAIC - Vidéo 6 - Phase CONTRÔLE", "u": "https://www.youtube.com/watch?v=TSoQf7F1dUY"}, {"n": "Objectif SMART", "u": "https://www.bdc.ca/fr/articles-outils/boite-outils-entrepreneur/gabarits-documents-guides-affaires/glossaire/objectifs-smart"}, {"n": "FIPEC (SIPOC)", "u": "https://www.bdc.ca/fr/articles-outils/operations/efficacite-operationnelle/quest-ce-cartographie-processus"}, {"n": "Technique Disney", "u": "https://fr.wikipedia.org/wiki/M%C3%A9thode_Walt_Disney"}, {"n": "(Vidéo) Diagramme causes-effets (Ishikawa)", "u": "https://www.youtube.com/watch?v=7BfI-HVPa-A"}, {"n": "Les 5 Pourquoi ?", "u": "https://fr.wikipedia.org/wiki/Cinq_pourquoi"}, {"n": "Comment faire une cartographie de processus", "u": "https://www.youtube.com/watch?v=fPsltWjM6o0"}, {"n": "Erreurs à éviter en cartographie de processus", "u": "https://www.youtube.com/watch?v=4z2PU_vK1ns"}, {"n": "Exemple de modélisation de processus avec Draw.io", "u": "https://www.youtube.com/watch?v=e9wANApZXL8"}, {"n": "Vidéo: améliorer, comment faire cette étape", "u": "http://www.excellence-operationnelle.tv/la-phase-innover-du-lean-six-sigma.php/"}, {"n": "TP4 - Vidéo: exemple de cartographie et d'analyse d'un processus de commande", "u": "https://www.youtube.com/watch?v=Tvdw6na62P4"}, {"n": "Logiciel gratuit de cartographie: Draw.io", "u": "https://www.draw.io/"}, {"n": "Gantt Project (télécharger)", "u": "https://www.ganttproject.biz/download"}, {"n": "Apprendre Gantt Project (vidéo)", "u": "https://www.youtube.com/watch?v=TAndnWJd1Lo"}]}, {"g": "Lean (S02)", "items": [{"n": "Vidéo: Toyota Production Systm (TPS)", "u": "https://www.youtube.com/watch?v=CGx32aMQEE4"}, {"n": "Vidéo: lean Management - Faire de la qualité", "u": "https://www.youtube.com/watch?v=Ccj80R3iUqE"}, {"n": "IMPORTANT - Vidéo: les 7 gaspillages", "u": "https://www.youtube.com/watch?v=0ceuTG6Bu6U"}]}, {"g": "ITIL : catalogue et changement (S03, S09-10)", "items": [{"n": "Defining it success through the service catalog", "u": "https://www3.pinkelephant.com/ressource/PinkLink/na/issue71/9789077212967SMPL.pdf"}, {"n": "Service Catalog Management: All You Need to Know", "u": "https://www.simplilearn.com/tutorials/itil-tutorial/service-catalog-management"}, {"n": "La courbe du changement", "u": "https://www.e-marketing.fr/Thematique/academie-1078/fiche-outils-10154/Les-vagues-du-changement--323950.htm"}, {"n": "Livre fortement suggéré - ITIL v4 Fondations", "u": "https://a.co/d/4U1CsTG"}]}, {"g": "Agilité (S05-06)", "items": [{"n": "Manifeste agile", "u": "https://agilemanifesto.org/iso/fr/manifesto.html"}, {"n": "Guide Scrum", "u": "https://scrumguides.org/index.html"}, {"n": "eXtreme Programming", "u": "http://www.extremeprogramming.org/map/project.html"}, {"n": "SAFe", "u": "https://scaledagileframework.com/"}, {"n": "Agilité pour petites organisations (vidéo, 15 min)", "u": "https://www.youtube.com/watch?v=3qMpB-UH9kA"}, {"n": "Agilité pour grandes organisations (Spotify, vidéo, 15 min)", "u": "https://www.youtube.com/watch?v=Yvfz4HGtoPc"}]}, {"g": "DevOps (S07-08)", "items": [{"n": "Les métiers du dev et de l'infra en 7 minutes", "u": "https://www.youtube.com/watch?v=vD8KgHFhLUk"}, {"n": "DevOps en 8 minutes", "u": "https://www.youtube.com/watch?v=M6F6GWcGxLQ"}, {"n": "CI/CD en 8 minutes", "u": "https://www.youtube.com/watch?v=ws1qGuFMYlc"}]}, {"g": "Cloud, DevSecOps et cybersécurité (S11)", "items": [{"n": "Comprendre les modèles de Cloud (IaaS, PaaS, SaaS, CaaS, FaaS)", "u": "https://youtu.be/Al-E4C69UmQ?si=XPOnq_fjALp0__08"}, {"n": "Serverless (FaaS)", "u": "https://www.youtube.com/watch?v=HaehHcLVCTo"}, {"n": "DevSecOps en 8 minutes", "u": "https://www.youtube.com/watch?v=pnkeQ_olSz0"}, {"n": "Cyber Kill Chain", "u": "https://www.exabeam.com/explainers/information-security/cyber-kill-chain-understanding-and-mitigating-advanced-threats/"}]}];
+
+/* ============ MOTEUR ============ */
+var CASES=M.find(function(m){return m.id==="rdmaic"}).exams;
+var THEMES=M.filter(function(m){return m.exams&&m.id!=="rdmaic"});
+var store={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+var tabs=document.getElementById("tabs"),main=document.getElementById("main");
+function allTabs(){return M.concat([{id:"blanc",tag:"Final",title:"Examen blanc complet"},{id:"liens",tag:"Liens",title:"Vidéos et ressources"}])}
+function linksHtml(){
+  var h='<p class="src">Liens tirés de ta page Moodle MTI825 · ouverts dans un nouvel onglet</p>';
+  LINKS.forEach(function(g){h+='<div class="card"><h3>'+g.g+'</h3><ul>';
+    g.items.forEach(function(it){h+='<li><a href="'+it.u+'" target="_blank" rel="noopener">'+it.n+'</a></li>'});
+    h+='</ul></div>'});
+  return h}
+
+function daysLeft(){var d=new Date("2026-12-02T18:00:00-05:00")-new Date();return Math.max(0,Math.ceil(d/864e5))}
+document.getElementById("count").innerHTML="<b>"+daysLeft()+" jours</b>avant l'examen du 2 déc.";
+
+function examHtml(e,key){
+  var saved=store.get("draft:"+key)||"";
+  return '<div class="exam"><div class="hd"><h3 style="margin:0">'+(e.lvl===2?'<span class="tag">Niveau 2</span>':'')+'Examen blanc · '+e.t+'</h3><span class="pts">'+e.pts+'</span></div>'+
+  '<p class="q">'+e.q+'</p>'+
+  '<textarea id="ta-'+key+'" data-key="'+key+'" placeholder="Rédige ta réponse ici avant d\'ouvrir le corrigé (brouillon gardé dans ce navigateur)." aria-label="Ma réponse">'+saved.replace(/</g,"&lt;")+'</textarea>'+
+  '<details class="key"><summary>Voir le corrigé modèle</summary>'+e.a+'</details></div>';
+}
+function render(id){
+  var t=allTabs().find(function(x){return x.id===id})||M[0];
+  Array.prototype.forEach.call(tabs.children,function(b){b.setAttribute("aria-selected",b.dataset.id===t.id?"true":"false")});
+  var h='<section class="panel" aria-label="'+t.title+'"><h2>'+t.title+'</h2>';
+  if(t.id==="liens"){main.innerHTML=h+linksHtml()+'</section>';window.scrollTo(0,0);return}
+  if(t.id==="blanc"){h+=finalHtml();main.innerHTML=h+'</section>';initFinal();return}
+  h+='<p class="src">'+t.src+'</p>'+t.secs.join("");
+  if(t.exams){t.exams.forEach(function(e,i){h+=examHtml(e,t.id+i)});
+    h+='<label class="fait"><input type="checkbox" id="fait" '+(store.get("done:"+t.id)==="1"?"checked":"")+'> J\'ai fait cet examen blanc et relu le corrigé</label>'}
+  main.innerHTML=h+'</section>';
+  var f=document.getElementById("fait");
+  if(f)f.addEventListener("change",function(){store.set("done:"+t.id,f.checked?"1":"0");markDone()});
+  Array.prototype.forEach.call(main.querySelectorAll("textarea[data-key]"),function(ta){ta.addEventListener("input",function(){store.set("draft:"+ta.dataset.key,ta.value)})});
+  window.scrollTo(0,0);
+}
+function markDone(){Array.prototype.forEach.call(tabs.children,function(b){b.classList.toggle("done",store.get("done:"+b.dataset.id)==="1")})}
+
+/* ---- examen complet ---- */
+var fin={c:null,a:null,b:null,sec:10800,run:false,iv:null};
+function pick(arr,not){var x;do{x=arr[Math.floor(Math.random()*arr.length)]}while(arr.length>1&&x===not);return x}
+function draw(){fin.c=pick(CASES,fin.c);var a=pick(THEMES),b=pick(THEMES,a);
+  var al=THEMES.filter(function(t){return t!==a});b=al[Math.floor(Math.random()*al.length)];fin.a=a;fin.b=b;
+  fin.ea=a.exams[Math.floor(Math.random()*a.exams.length)];fin.eb=b.exams[Math.floor(Math.random()*b.exams.length)];fin.sec=10800;fin.run=false;clearInterval(fin.iv)}
+function fmt(s){var h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h+":"+String(m).padStart(2,"0")+":"+String(x).padStart(2,"0")}
+function finalHtml(){
+  if(!fin.c)draw();
+  return '<p class="src">3 questions tirées au hasard · 3 h · papier à l\'examen réel, ici tu peux écrire dans les zones</p>'+
+  '<div class="card" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><span class="timer" id="tm">'+fmt(fin.sec)+'</span>'+
+  '<button class="btn" id="go">'+(fin.run?"Pause":"Démarrer")+'</button><button class="btn ghost" id="nw">Nouvel examen</button>'+
+  '<span class="hint">Budget conseillé : Q1 85 min · Q2 40 min · Q3 40 min · relecture 15 min</span></div>'+
+  examHtml({t:fin.c.t,pts:"Q1 · 50 %",q:fin.c.q,a:fin.c.a,lvl:fin.c.lvl},"f-q1")+
+  examHtml({t:fin.ea.t,pts:"Q2 · 25 %",q:fin.ea.q,a:fin.ea.a,lvl:fin.ea.lvl},"f-q2")+
+  examHtml({t:fin.eb.t,pts:"Q3 · 25 %",q:fin.eb.q,a:fin.eb.a,lvl:fin.eb.lvl},"f-q3");
+}
+function initFinal(){
+  var tm=document.getElementById("tm"),go=document.getElementById("go"),nw=document.getElementById("nw");
+  function tick(){if(fin.sec>0){fin.sec--;tm.textContent=fmt(fin.sec)}else{clearInterval(fin.iv);fin.run=false;go.textContent="Démarrer"}}
+  go.addEventListener("click",function(){fin.run=!fin.run;go.textContent=fin.run?"Pause":"Démarrer";clearInterval(fin.iv);if(fin.run)fin.iv=setInterval(tick,1000)});
+  if(fin.run)fin.iv=setInterval(tick,1000);
+  nw.addEventListener("click",function(){["f-q1","f-q2","f-q3"].forEach(function(k){store.set("draft:"+k,"")});draw();render("blanc")});
+  Array.prototype.forEach.call(main.querySelectorAll("textarea[data-key]"),function(ta){ta.addEventListener("input",function(){store.set("draft:"+ta.dataset.key,ta.value)})});
+}
+
+allTabs().forEach(function(t){var b=document.createElement("button");b.dataset.id=t.id;b.setAttribute("role","tab");
+  b.innerHTML='<span class="d">'+t.tag+'</span>'+t.title.split(":")[0];b.addEventListener("click",function(){location.hash=t.id});tabs.appendChild(b)});
+function route(){clearInterval(fin.iv);fin.run=false;render(location.hash.slice(1)||"plan")}
+window.addEventListener("hashchange",route);
+markDone();route();
+</script>
+
+</body></html>

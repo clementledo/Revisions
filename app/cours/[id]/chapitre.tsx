@@ -56,7 +56,9 @@ export default function ChapterScreen() {
             label={due ? `Cartes (${due})` : 'Cartes'}
             onPress={() => router.push(`/cartes?course=${id}&ch=${ch}${due ? '' : '&all=1'}`)}
           />
-          <Button style={{ flex: 1 }} kind="soft" color={c} icon="format-list-checks" label="QCM" onPress={() => router.push(`${base}/quiz?ch=${ch}`)} />
+          {course.questions.some((q) => q.t !== 'ex') && (
+            <Button style={{ flex: 1 }} kind="soft" color={c} icon="format-list-checks" label="QCM" onPress={() => router.push(`${base}/quiz?ch=${ch}`)} />
+          )}
         </View>
       </View>
 
