@@ -43,6 +43,8 @@ export type Course = {
   icon: string;
   /** Date de l'examen final (AAAA-MM-JJ), si connue. */
   exam?: string;
+  /** Cours terminé (examen passé) : hors des révisions du jour, toujours consultable. */
+  done?: boolean;
   /** Page de révision embarquée (assets/pages/<id>.html), absente tant que le contenu n'est pas fourni. */
   page?: number;
   antiseche?: number;

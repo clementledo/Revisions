@@ -1,12 +1,27 @@
-import { Text, View } from 'react-native';
+import { Text, View } from "react-native";
 
-import { Bar, Card, Icon, Ring, RingLabel, type IconName } from '@/components/ui';
-import { courseProgress } from '@/lib/study';
-import { makeStyles, space, tone, toneSoft, type, useTheme } from '@/lib/theme';
-import type { Course } from '@/lib/types';
+import {
+  Bar,
+  Card,
+  Icon,
+  Ring,
+  RingLabel,
+  type IconName,
+} from "@/components/ui";
+import { courseProgress } from "@/lib/study";
+import { makeStyles, space, tone, toneSoft, type, useTheme } from "@/lib/theme";
+import type { Course } from "@/lib/types";
 
 /** Carte d'un cours sur l'accueil : icône, titre, lecture et maîtrise. */
-export function CourseCard({ course, onPress, due }: { course: Course; onPress: () => void; due: number }) {
+export function CourseCard({
+  course,
+  onPress,
+  due,
+}: {
+  course: Course;
+  onPress: () => void;
+  due: number;
+}) {
   const { p } = useTheme();
   const s = useStyles();
   const empty = !course.lessons.length;
@@ -24,7 +39,12 @@ export function CourseCard({ course, onPress, due }: { course: Course; onPress: 
             {course.title}
           </Text>
         </View>
-        {empty ? (
+        {course.done ? (
+          <View style={[s.soon, s.doneTag, { backgroundColor: p.goodSoft }]}>
+            <Icon name="check-circle" size={14} color={p.good} />
+            <Text style={[s.soonText, { color: p.good }]}>Terminé</Text>
+          </View>
+        ) : empty ? (
           <View style={[s.soon, { backgroundColor: p.surface2 }]}>
             <Text style={s.soonText}>Bientôt</Text>
           </View>
@@ -34,14 +54,32 @@ export function CourseCard({ course, onPress, due }: { course: Course; onPress: 
           </Ring>
         )}
       </View>
-      {empty ? (
-        <Text style={s.sub}>Envoie ta page de révision et tes slides dans le fil : le cours apparaîtra ici.</Text>
+      {course.done ? (
+        <Text style={s.sub}>
+          Examen passé · maîtrise finale {Math.round(prog.level * 100)} %. Le
+          cours reste consultable.
+        </Text>
+      ) : empty ? (
+        <Text style={s.sub}>
+          Envoie ta page de révision et tes slides dans le fil : le cours
+          apparaîtra ici.
+        </Text>
       ) : (
         <View style={{ gap: 8 }}>
           <View style={s.meta}>
-            <Meta icon="book-open-page-variant-outline" text={`${course.lessons.length} chapitres`} />
-            <Meta icon="cards-outline" text={due ? `${due} à revoir` : 'Cartes à jour'} strong={due > 0} />
-            <Meta icon="format-list-checks" text={`${course.questions.length} questions`} />
+            <Meta
+              icon="book-open-page-variant-outline"
+              text={`${course.lessons.length} chapitres`}
+            />
+            <Meta
+              icon="cards-outline"
+              text={due ? `${due} à revoir` : "Cartes à jour"}
+              strong={due > 0}
+            />
+            <Meta
+              icon="format-list-checks"
+              text={`${course.questions.length} questions`}
+            />
           </View>
           <View style={s.readRow}>
             <View style={{ flex: 1 }}>
@@ -54,27 +92,61 @@ export function CourseCard({ course, onPress, due }: { course: Course; onPress: 
     </Card>
   );
 
-  function Meta({ icon, text, strong }: { icon: IconName; text: string; strong?: boolean }) {
+  function Meta({
+    icon,
+    text,
+    strong,
+  }: {
+    icon: IconName;
+    text: string;
+    strong?: boolean;
+  }) {
     return (
       <View style={s.metaItem}>
         <Icon name={icon} size={14} color={strong ? c : p.muted} />
-        <Text style={[s.metaText, strong && { color: c, fontWeight: '700' }]}>{text}</Text>
+        <Text style={[s.metaText, strong && { color: c, fontWeight: "700" }]}>
+          {text}
+        </Text>
       </View>
     );
   }
 }
 
 const useStyles = makeStyles((p) => ({
-  top: { flexDirection: 'row', alignItems: 'center', gap: 14 },
-  tile: { width: 48, height: 48, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  top: { flexDirection: "row", alignItems: "center", gap: 14 },
+  tile: {
+    width: 48,
+    height: 48,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   code: { ...type.overline, fontSize: 11 },
   title: { ...type.headline, fontSize: 17, color: p.text },
   sub: { ...type.callout, color: p.muted },
   soon: { borderRadius: 99, paddingHorizontal: 10, paddingVertical: 4 },
-  soonText: { fontFamily: 'Inter', fontSize: 12, fontWeight: '700', color: p.muted },
-  meta: { flexDirection: 'row', flexWrap: 'wrap', columnGap: space.md, rowGap: 4 },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  doneTag: { flexDirection: "row", alignItems: "center", gap: 5 },
+  soonText: {
+    fontFamily: "Inter",
+    fontSize: 12,
+    fontWeight: "700",
+    color: p.muted,
+  },
+  meta: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    columnGap: space.md,
+    rowGap: 4,
+  },
+  metaItem: { flexDirection: "row", alignItems: "center", gap: 4 },
   metaText: { ...type.caption, color: p.muted },
-  readRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  readText: { ...type.caption, fontSize: 11.5, color: p.muted, fontWeight: '600', width: 54, textAlign: 'right' },
+  readRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  readText: {
+    ...type.caption,
+    fontSize: 11.5,
+    color: p.muted,
+    fontWeight: "600",
+    width: 54,
+    textAlign: "right",
+  },
 }));

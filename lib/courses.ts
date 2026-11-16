@@ -36,6 +36,7 @@ export const COURSES: Course[] = [
     color: '#4c5bd4',
     icon: 'shield-check-outline',
     exam: '2026-10-17',
+    done: true,
     page: require('@/assets/pages/mgl805.html'),
     antiseche: require('@/assets/pages/mgl805-antiseche.html'),
     chapters: mgl805Chapters,
@@ -85,6 +86,10 @@ export const COURSES: Course[] = [
 ];
 
 export const courseById = (id: string) => COURSES.find((c) => c.id === id);
+/** Cours encore à réviser (les cours terminés restent consultables, sans cartes du jour). */
+export const ACTIVE = COURSES.filter((c) => !c.done);
+export const FINISHED = COURSES.filter((c) => c.done);
+
 export const chapterLabel = (c: { eyebrow: string; id: string }) => c.eyebrow || c.id.toUpperCase();
 
 /** Jours avant l'examen (0 = aujourd'hui), ou null s'il est passé ou inconnu. */

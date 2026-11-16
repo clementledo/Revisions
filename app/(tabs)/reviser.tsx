@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import { Text, View } from 'react-native';
 
 import { Button, Card, Group, Icon, Press, Ring, Row, Screen, Section, type IconName } from '@/components/ui';
-import { COURSES } from '@/lib/courses';
+import { ACTIVE } from '@/lib/courses';
 import { useStoreVersion } from '@/lib/store';
 import { chapterStats, dueCards } from '@/lib/study';
 import { makeStyles, radius, shadow, tone, toneSoft, type, useTheme } from '@/lib/theme';
@@ -12,7 +12,7 @@ export default function Review() {
   const router = useRouter();
   const { p } = useTheme();
   const s = useStyles();
-  const ready = COURSES.filter((c) => c.lessons.length);
+  const ready = ACTIVE.filter((c) => c.lessons.length);
   const totalDue = ready.reduce((a, c) => a + dueCards(c).length, 0);
 
   return (

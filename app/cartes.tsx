@@ -4,7 +4,7 @@ import { Animated, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Bar, Button, Empty, Icon, Pill, Ring, Stat } from '@/components/ui';
-import { COURSES, courseById } from '@/lib/courses';
+import { ACTIVE, courseById } from '@/lib/courses';
 import { read } from '@/lib/store';
 import { dueCards, nextLabel, rateCard, srsKey, type Rating, type SrsMap } from '@/lib/study';
 import { alpha, makeStyles, radius, shadow, space, tone, type, useTheme } from '@/lib/theme';
@@ -23,7 +23,7 @@ const shuffle = <T,>(a: T[]) => {
 };
 
 function buildSession(courseId: string, ch?: string, all?: boolean): Item[] {
-  const courses = courseId === 'all' ? COURSES : [courseById(courseId)!];
+  const courses = courseId === 'all' ? ACTIVE : [courseById(courseId)!];
   const items = courses.flatMap((course) =>
     (all ? course.cards.filter((c) => !ch || c.ch === ch) : dueCards(course, ch)).map((card) => ({ course, card })),
   );
