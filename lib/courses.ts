@@ -73,7 +73,7 @@ export const COURSES: Course[] = [
     questions: mti825Questions,
     cards: mti825Cards,
     slideKeys: [
-      ['lean', /lean|muda/],
+      ['lean', /lean/],
       ['agile', /agil/],
       ['devops', /devops/],
       ['archi', /architecture/],
