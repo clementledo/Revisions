@@ -138,6 +138,13 @@ export default function CourseScreen() {
         show: has((ch) => ch.id === "formules"),
       },
       {
+        icon: "sort-variant",
+        label: "Trier ITIL",
+        sub: `${course.sort?.items.length ?? 0} pratiques`,
+        go: `${base}/tri`,
+        show: course.sort,
+      },
+      {
         icon: "timer-outline",
         label: "Examen",
         sub: "Blanc, 3 h",

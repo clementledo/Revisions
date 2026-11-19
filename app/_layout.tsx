@@ -83,6 +83,7 @@ export default function RootLayout() {
           <Stack.Screen name="cours/[id]/exercices" options={{ title: 'Exercices' }} />
           <Stack.Screen name="cours/[id]/antiseche" options={{ title: 'Antisèche' }} />
           <Stack.Screen name="cours/[id]/slides" options={{ title: 'Slides' }} />
+          <Stack.Screen name="cours/[id]/tri" options={{ title: 'Trier' }} />
           <Stack.Screen name="cartes" options={{ title: 'Cartes mémoire' }} />
           <Stack.Screen name="pdf" options={{ title: '' }} />
           <Stack.Screen name="parametres" options={{ title: 'Paramètres' }} />

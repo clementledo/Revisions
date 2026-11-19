@@ -3,6 +3,7 @@ import { chapters as mti825Chapters, questions as mti825Questions } from '@/cont
 import { chapters as mti881Chapters, questions as mti881Questions } from '@/content/generated/mti881';
 import { cards as mgl805Cards } from '@/content/mgl805/cartes';
 import { cards as mti825Cards } from '@/content/mti825/cartes';
+import { itilSort } from '@/content/mti825/tri';
 import { cards as mti881Cards } from '@/content/mti881/cartes';
 import type { Course, Question } from '@/lib/types';
 
@@ -73,6 +74,7 @@ export const COURSES: Course[] = [
     quizChapters: {},
     questions: mti825Questions,
     cards: mti825Cards,
+    sort: itilSort,
     slideKeys: [
       ['lean', /lean/],
       ['agile', /agil/],
