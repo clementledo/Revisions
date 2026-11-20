@@ -37,13 +37,10 @@ export default function Slides() {
 
   return (
     <Screen>
-      <Muted style={{ paddingHorizontal: 2 }}>
-        Choisis tes PDF dans le sélecteur (Google Drive y apparaît). Ils sont copiés dans l’app et rangés d’après leur nom, par exemple «
-        {course.code}_Cours3_….pdf ».
-      </Muted>
-      <Button label="Ajouter des slides" icon="plus" size="lg" color={course.color} onPress={add} />
+      <Muted style={{ paddingHorizontal: 2 }}>PDF rangés selon leur nom, par exemple « {course.code}_Cours3.pdf ».</Muted>
+      <Button label="Ajouter des slides" icon="plus" size="lg" onPress={add} />
 
-      {!mine.length && <Empty icon="presentation" title="Aucune slide pour l'instant" sub="Tu peux en choisir plusieurs d'un coup." />}
+      {!mine.length && <Empty icon="presentation" title="Aucune slide pour l'instant" sub="Plusieurs fichiers à la fois." />}
 
       {groups.map((g) => {
         const list = mine.filter((d) => (d.chapter ?? undefined) === g.id);
@@ -55,7 +52,7 @@ export default function Slides() {
                 <View key={d.id}>
                   <Row
                     icon="file-pdf-box"
-                    color={course.color}
+                   
                     title={d.name}
                     sub={formatSize(d.size)}
                     onPress={() => router.push(`/pdf?id=${d.id}`)}
@@ -73,7 +70,7 @@ export default function Slides() {
                             key={x.id ?? 'autres'}
                             label={x.id ? x.title.replace('Cours ', 'C').replace(' · partie ', '') : 'Autre'}
                             active={(d.chapter ?? undefined) === x.id}
-                            color={course.color}
+                           
                             onPress={() => {
                               editDoc(d.id, { chapter: x.id });
                               setEditing(null);
@@ -87,7 +84,7 @@ export default function Slides() {
                         icon="trash-can-outline"
                         label="Retirer de l'app"
                         onPress={() =>
-                          Alert.alert('Retirer ce fichier ?', `${d.name}\nIl reste sur ton Drive.`, [
+                          Alert.alert('Retirer ce fichier ?', `${d.name}\nLe fichier reste sur Drive.`, [
                             { text: 'Annuler', style: 'cancel' },
                             { text: 'Retirer', style: 'destructive', onPress: () => removeDoc(d.id) },
                           ])

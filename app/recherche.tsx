@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { Empty, Group, Icon, Screen, Section } from '@/components/ui';
-import { COURSES } from '@/lib/courses';
+import { ACTIVE as COURSES } from "@/lib/courses";
 import { makeStyles, radius, shadow, tone, type, useTheme } from '@/lib/theme';
 
 // Comparaison sans accents ni majuscules, en gardant la même longueur que le texte d'origine.
@@ -88,7 +88,7 @@ export default function Search() {
   const hits = useMemo(() => search(q), [q]);
 
   return (
-    <Screen title="Recherche">
+    <Screen>
       <View style={[s.box, shadow(p)]}>
         <Icon name="magnify" size={22} color={p.muted} />
         <TextInput
@@ -108,7 +108,7 @@ export default function Search() {
       </View>
 
       {q.trim().length >= 2 && !hits.length && <Empty icon="text-search" title="Aucun résultat" sub="Essaie un autre mot ou une orthographe différente." />}
-      {q.trim().length < 2 && <Empty icon="magnify" title="Cherche dans tous tes cours" sub="Le texte des chapitres, les cartes mémoire et les questions." />}
+      {q.trim().length < 2 && <Empty icon="magnify" title="Rechercher" sub="Chapitres, cartes et questions." />}
 
       {(['cours', 'carte', 'question'] as const).map((k) => {
         const list = hits.filter((h) => h.kind === k);

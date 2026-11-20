@@ -15,13 +15,12 @@ export default function List() {
     return (
       <Screen>
         <Stack.Screen options={{ title: 'Calculateurs' }} />
-        <Muted style={{ paddingHorizontal: 2 }}>Les calculateurs de ta page : change les valeurs, le calcul se refait pas à pas.</Muted>
         <Group>
           {items.map(({ ch, w }) => (
             <Row
               key={w.id}
               icon="calculator-variant-outline"
-              color={course.color}
+             
               title={w.title}
               sub={ch.eyebrow + ' · ' + ch.title}
               onPress={() => router.push(`/cours/${id}/lire?ch=${ch.id}&anchor=${w.id}`)}
@@ -36,7 +35,6 @@ export default function List() {
     return (
       <Screen>
         <Stack.Screen options={{ title: 'Pièges d’examen' }} />
-        <Muted style={{ paddingHorizontal: 2 }}>Les encadrés « piège » de ta page, partie par partie : ce que l’examen aime tester.</Muted>
         <Group>
           {lessons
             .filter((ch) => ch.traps)
@@ -58,7 +56,6 @@ export default function List() {
   return (
     <Screen>
       <Stack.Screen options={{ title: 'Récaps' }} />
-      <Muted style={{ paddingHorizontal: 2 }}>L’essentiel, les formules, les pièges et ce que tu dois savoir faire, pour chaque cours.</Muted>
       <Group>
         {lessons
           .filter((ch) => ch.hasRecap)
@@ -66,7 +63,7 @@ export default function List() {
             <Row
               key={ch.id}
               icon="star-four-points-outline"
-              color={course.color}
+             
               title={ch.title}
               sub={ch.eyebrow}
               onPress={() => router.push(`/cours/${id}/lire?ch=${ch.id}&mode=recap`)}

@@ -5,47 +5,18 @@ import { useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { useStored } from '@/lib/store';
-import { THEMES, ThemeContext, type ThemeId, type ThemeMode } from '@/lib/theme';
+import { THEME_CHOICES, THEMES, ThemeContext, type ThemeChoice, type ThemeId } from '@/lib/theme';
 
 export { ErrorBoundary } from 'expo-router';
 
 export default function RootLayout() {
   const system = useColorScheme();
-  // « theme » = thème clair choisi (ou ancien choix unique), « themeDark » = thème sombre, « themeMode » = clair / sombre / auto.
-  const [storedLight, setLight] = useStored<string>('theme', 'porcelaine');
-  const [storedDark, setDark] = useStored<string>('themeDark', '');
-  const [storedMode, setMode] = useStored<ThemeMode | ''>('themeMode', '');
-
-  const valid = (t: string, dark: boolean) => t in THEMES && THEMES[t as ThemeId].palette.dark === dark;
-  // Ancien réglage : un seul thème, parfois sombre.
-  const legacyDark = valid(storedLight, true) ? (storedLight as ThemeId) : null;
-  const lightId: ThemeId = valid(storedLight, false) ? (storedLight as ThemeId) : 'porcelaine';
-  const darkId: ThemeId = valid(storedDark, true) ? (storedDark as ThemeId) : (legacyDark ?? 'minuit');
-  const mode: ThemeMode = storedMode || (legacyDark ? 'dark' : 'light');
-  const isDark = mode === 'auto' ? system === 'dark' : mode === 'dark';
-  const id = isDark ? darkId : lightId;
+  // « appTheme » : auto, blanc, creme, sombre ou noir. Les anciens réglages (13 thèmes) repassent en automatique.
+  const [stored, setStored] = useStored<string>('appTheme', 'auto');
+  const choice: ThemeChoice = (THEME_CHOICES as string[]).includes(stored) ? (stored as ThemeChoice) : 'auto';
+  const id: ThemeId = choice === 'auto' ? (system === 'dark' ? 'sombre' : 'blanc') : choice;
   const p = THEMES[id].palette;
-
-  const ctx = useMemo(
-    () => ({
-      id,
-      p,
-      mode,
-      lightId,
-      darkId,
-      setMode: (m: ThemeMode) => setMode(m),
-      setTheme: (t: ThemeId) => {
-        if (THEMES[t].palette.dark) {
-          setDark(t);
-          if (mode !== 'auto') setMode('dark');
-        } else {
-          setLight(t);
-          if (mode !== 'auto') setMode('light');
-        }
-      },
-    }),
-    [id, p, mode, lightId, darkId, setMode, setDark, setLight],
-  );
+  const ctx = useMemo(() => ({ id, p, choice, setChoice: (c: ThemeChoice) => setStored(c) }), [id, p, choice, setStored]);
 
   const base = p.dark ? DarkTheme : DefaultTheme;
   const nav = {
@@ -69,12 +40,14 @@ export default function RootLayout() {
             headerTintColor: p.text,
             headerShadowVisible: false,
             headerStyle: { backgroundColor: p.bg },
-            headerTitleStyle: { fontFamily: 'Inter', fontWeight: '700', fontSize: 17 },
+            headerTitleStyle: { fontFamily: 'Inter', fontWeight: '600', fontSize: 16 },
             headerTitleAlign: 'center',
             contentStyle: { backgroundColor: p.bg },
             animation: 'slide_from_right',
           }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="recherche" options={{ title: 'Recherche' }} />
+          <Stack.Screen name="progres" options={{ title: 'Progrès' }} />
           <Stack.Screen name="cours/[id]/index" options={{ title: '' }} />
           <Stack.Screen name="cours/[id]/chapitre" options={{ title: '' }} />
           <Stack.Screen name="cours/[id]/lire" options={{ title: '' }} />
@@ -83,7 +56,7 @@ export default function RootLayout() {
           <Stack.Screen name="cours/[id]/exercices" options={{ title: 'Exercices' }} />
           <Stack.Screen name="cours/[id]/antiseche" options={{ title: 'Antisèche' }} />
           <Stack.Screen name="cours/[id]/slides" options={{ title: 'Slides' }} />
-          <Stack.Screen name="cours/[id]/tri" options={{ title: 'Trier' }} />
+          <Stack.Screen name="cours/[id]/tri" options={{ title: 'Tableaux' }} />
           <Stack.Screen name="cartes" options={{ title: 'Cartes mémoire' }} />
           <Stack.Screen name="pdf" options={{ title: '' }} />
           <Stack.Screen name="parametres" options={{ title: 'Paramètres' }} />

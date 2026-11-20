@@ -72,13 +72,13 @@ export default function Quiz() {
       <Screen>
         <Section title="Chapitre">
         <View style={s.chips}>
-          <Chip label="Tous" active={chapter === 'all'} color={course.color} onPress={() => setChapter('all')} />
+          <Chip label="Tous" active={chapter === 'all'} onPress={() => setChapter('all')} />
           {course.lessons.map((l) => (
             <Chip
               key={l}
               label={shortLabel(course.chapters.find((c) => c.id === l)!.eyebrow)}
               active={chapter === l}
-              color={course.color}
+             
               onPress={() => setChapter(l)}
             />
           ))}
@@ -87,18 +87,18 @@ export default function Quiz() {
         <Section title="Type de questions">
         <View style={s.chips}>
           {TYPES.filter((t) => t.id === 'all' || course.questions.some((q) => q.t === t.id)).map((t) => (
-            <Chip key={t.id} label={t.label} active={type === t.id} color={course.color} onPress={() => setType(t.id)} />
+            <Chip key={t.id} label={t.label} active={type === t.id} onPress={() => setType(t.id)} />
           ))}
         </View>
         </Section>
         <Section title="Questions">
         <View style={s.chips}>
-          <Chip label="Toutes" active={!mistakes} color={course.color} onPress={() => setMistakes(false)} />
-          <Chip label="Mes erreurs seulement" active={mistakes} color={course.color} onPress={() => setMistakes(true)} />
+          <Chip label="Toutes" active={!mistakes} onPress={() => setMistakes(false)} />
+          <Chip label="Mes erreurs seulement" active={mistakes} onPress={() => setMistakes(true)} />
         </View>
         </Section>
-        <Card tint={toneSoft(course.color, p)} style={s.summary}>
-          <View style={[s.summaryIcon, { backgroundColor: tone(course.color, p) }]}>
+        <Card tint={p.accentSoft} style={s.summary}>
+          <View style={[s.summaryIcon, { backgroundColor: p.accent }]}>
             <Icon name="format-list-checks" size={22} color={p.dark ? '#0b0d12' : '#fff'} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
@@ -106,7 +106,7 @@ export default function Quiz() {
             <Text style={s.count}>Ordre mélangé, explication après chaque réponse.</Text>
           </View>
         </Card>
-        <Button label="Commencer" icon="play" size="lg" color={course.color} disabled={!n} onPress={() => start(pool())} />
+        <Button label="Commencer" icon="play" size="lg" disabled={!n} onPress={() => start(pool())} />
       </Screen>
     );
   }
@@ -130,9 +130,9 @@ export default function Quiz() {
             <Stat value={String(run.length)} label="questions" />
           </View>
         </Card>
-        {wrong.length > 0 && <Button label={`Refaire mes ${wrong.length} erreur${wrong.length > 1 ? 's' : ''}`} icon="refresh" size="lg" color={course.color} onPress={() => start(wrong)} />}
-        <Button label="Nouveau QCM" kind="soft" color={course.color} onPress={() => setRun(null)} />
-        <Button label="Retour au cours" kind="ghost" color={course.color} onPress={() => router.back()} />
+        {wrong.length > 0 && <Button label={`Refaire mes ${wrong.length} erreur${wrong.length > 1 ? 's' : ''}`} icon="refresh" size="lg" onPress={() => start(wrong)} />}
+        <Button label="Nouveau QCM" kind="soft" onPress={() => setRun(null)} />
+        <Button label="Retour au cours" kind="ghost" onPress={() => router.back()} />
       </Screen>
     );
   }
@@ -166,7 +166,7 @@ export default function Quiz() {
     <Screen>
       <View style={s.progress}>
         <View style={{ flex: 1 }}>
-          <Bar value={(pos + (answered ? 1 : 0)) / run.length} color={tone(course.color, p)} />
+          <Bar value={(pos + (answered ? 1 : 0)) / run.length} color={p.accent} />
         </View>
         <Text style={s.count}>
           {pos + 1} / {run.length}
@@ -174,7 +174,7 @@ export default function Quiz() {
       </View>
       <Card style={{ gap: space.md, padding: 18 }}>
         <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-          <Pill label={TLABEL[q.t]} color={course.color} />
+          <Pill label={TLABEL[q.t]} />
           <Text style={s.chapter} numberOfLines={1}>
             {chapterTitle?.eyebrow}
           </Text>
@@ -218,12 +218,12 @@ export default function Quiz() {
               keyboardType={q.t === 'num' ? 'numeric' : 'default'}
               autoCapitalize="none"
               autoCorrect={false}
-              placeholder="Ta réponse"
+              placeholder="Réponse"
               placeholderTextColor={p.muted}
               onSubmitEditing={() => typed && submit(typed)}
               style={[s.input, answered && { borderColor: ok ? p.good : p.bad }]}
             />
-            {!answered && <Button label="Valider" color={course.color} disabled={!typed} onPress={() => submit(typed)} />}
+            {!answered && <Button label="Valider" disabled={!typed} onPress={() => submit(typed)} />}
           </View>
         )}
 
@@ -239,7 +239,7 @@ export default function Quiz() {
           </View>
         )}
       </Card>
-      {answered && <Button label={pos + 1 < run.length ? 'Question suivante' : 'Voir mon score'} icon="arrow-right" size="lg" color={course.color} onPress={next} />}
+      {answered && <Button label={pos + 1 < run.length ? 'Question suivante' : 'Voir mon score'} icon="arrow-right" size="lg" onPress={next} />}
     </Screen>
   );
 }

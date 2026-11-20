@@ -20,30 +20,17 @@ export default function ChapterScreen() {
   const due = dueCards(course, ch).length;
   const slides = allDocs().filter((d) => d.course === id && d.chapter === ch && d.kind === 'slides');
   const base = `/cours/${id}`;
-  const c = course.color;
+  const c = p.accent;
   const extras = chapter.hasRecap || chapter.examples > 0 || chapter.traps > 0 || chapter.widgets.length > 0 || slides.length > 0;
 
   return (
     <Screen>
       <Stack.Screen options={{ title: chapter.eyebrow }} />
       <View style={{ gap: 8 }}>
-        <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
-          <Pill label={chapter.eyebrow} color={c} />
-          {chapter.hot && <Pill label="Signalé par le prof" icon="star" color={p.bad} />}
-          {st.read && <Pill label="Lu" icon="check" color={p.good} />}
-        </View>
+        {chapter.hot && <Pill label="Signalé par le prof" icon="star" color={p.bad} />}
         <Text style={s.title}>{chapter.title}</Text>
         {!!chapter.lede && <Text style={s.lede}>{chapter.lede}</Text>}
       </View>
-
-      <Card style={{ gap: 14 }}>
-        <View style={s.statRow}>
-          <Stat value={`${st.mastered}/${st.cards}`} label="cartes maîtrisées" />
-          <Stat value={`${st.quizOk}/${st.quizTotal}`} label="questions réussies" />
-          <Stat value={`${Math.round(st.level * 100)} %`} label="niveau" color={c} />
-        </View>
-        <Bar value={st.level} color={tone(c, p)} />
-      </Card>
 
       <View style={{ gap: space.sm }}>
         <Button label={st.read ? 'Relire le chapitre' : 'Lire le chapitre'} icon="book-open-variant" size="lg" color={c} onPress={() => router.push(`${base}/lire?ch=${ch}`)} />
@@ -94,13 +81,13 @@ export default function ChapterScreen() {
         </Section>
       )}
 
-      <Section title={`Sections · ${chapter.sections.length}`}>
+      <Section title="Sections">
         <Group inset={52}>
           {chapter.sections.map((sec, i) => (
             <Row
               key={sec.index}
               title={sec.title}
-              leading={<Text style={[s.num, { color: tone(c, p) }]}>{String(i + 1).padStart(2, '0')}</Text>}
+              leading={<Text style={[s.num, { color: c }]}>{String(i + 1).padStart(2, '0')}</Text>}
               onPress={() => router.push(`${base}/lire?ch=${ch}&anchor=${sec.index}`)}
             />
           ))}

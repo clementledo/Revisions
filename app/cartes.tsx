@@ -93,7 +93,7 @@ export default function Flashcards() {
 
   const state = read<SrsMap>(srsKey(item.course.id), {})[item.card.id];
   const chapter = item.course.chapters.find((x) => x.id === item.card.ch);
-  const c = tone(item.course.color, p);
+  const c = p.accent;
 
   const turn = () => {
     Animated.spring(flip, { toValue: flipped ? 0 : 1, useNativeDriver: true, friction: 8, tension: 60 }).start();
@@ -141,7 +141,7 @@ export default function Flashcards() {
             <Text style={s.q}>{item.card.q}</Text>
             <View style={s.hint}>
               <Icon name="gesture-tap" size={17} color={p.muted} />
-              <Text style={s.hintText}>Touche pour retourner</Text>
+              <Text style={s.hintText}>Toucher pour retourner</Text>
             </View>
           </Animated.View>
           <Animated.View style={[s.card, s.backCard, shadow(p, 2), { opacity: backOp, transform: [{ perspective: 1200 }, { rotateY: back }] }]}>
@@ -169,7 +169,7 @@ export default function Flashcards() {
         </View>
       ) : (
         <View style={{ paddingHorizontal: 18 }}>
-          <Button label="Voir la réponse" size="lg" color={item.course.color} onPress={turn} />
+          <Button label="Voir la réponse" size="lg" onPress={turn} />
         </View>
       )}
     </View>

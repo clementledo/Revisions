@@ -75,8 +75,8 @@ export default function CheatSheet() {
             <ActivityIndicator style={{ flex: 1 }} color={p.accent} />
           )}
           <View style={{ flexDirection: 'row', gap: space.sm, paddingHorizontal: 18, paddingTop: space.md, paddingBottom: space.lg, borderTopWidth: 1, borderTopColor: p.line, backgroundColor: p.surface }}>
-            <Button style={{ flex: 1 }} kind="soft" color={course.color} icon="printer-outline" label="Imprimer" disabled={busy} onPress={() => exportPdf(false)} />
-            <Button style={{ flex: 1 }} icon="share-variant" label="Partager en PDF" color={course.color} disabled={busy} onPress={() => exportPdf(true)} />
+            <Button style={{ flex: 1 }} kind="soft" icon="printer-outline" label="Imprimer" disabled={busy} onPress={() => exportPdf(false)} />
+            <Button style={{ flex: 1 }} icon="share-variant" label="Partager en PDF" disabled={busy} onPress={() => exportPdf(true)} />
           </View>
         </>
       ) : (
@@ -87,7 +87,7 @@ export default function CheatSheet() {
                 <Row
                   key={d.id}
                   icon={d.mime.startsWith('image/') ? 'image-outline' : 'file-pdf-box'}
-                  color={course.color}
+                 
                   title={d.name}
                   sub={formatSize(d.size)}
                   onPress={() => router.push(`/pdf?id=${d.id}`)}
@@ -109,16 +109,15 @@ export default function CheatSheet() {
               ))}
             </Group>
           ) : (
-            <Empty icon="file-document-edit-outline" title="Ta propre antisèche" sub="Ajoute ta feuille en PDF ou en photo (recto et verso) depuis ton téléphone ou ton Drive." />
+            <Empty icon="file-document-edit-outline" title="Antisèche personnelle" sub="PDF ou photos, recto et verso." />
           )}
           <Button
-            label="Ajouter mon antisèche"
+            label="Ajouter une antisèche"
             icon="plus"
             size="lg"
-            color={course.color}
+           
             onPress={() => importDocs({ course: id, kind: 'antiseche', images: true })}
           />
-          <Muted style={{ textAlign: 'center' }}>Tu peux aussi me l’envoyer dans le fil : je l’intègre dans l’app.</Muted>
         </Screen>
       )}
     </View>

@@ -56,9 +56,6 @@ function SortList({ course }: { course: Course }) {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: p.bg }} contentContainerStyle={[s.content, { paddingBottom: insets.bottom + 40 }]}>
       <Stack.Screen options={{ title: 'Tableaux à trier' }} />
-      <Text style={s.listIntro}>
-        Les tableaux à connaître par cœur, en exercices de tri. Après chaque réponse : la description du cours et un exemple concret.
-      </Text>
       {course.chapters
         .filter((ch) => sorts.some((x) => x.chapter === ch.id))
         .map((ch) => (
@@ -72,7 +69,7 @@ function SortList({ course }: { course: Course }) {
                     <Row
                       key={x.id}
                       icon="sort-variant"
-                      color={course.color}
+                     
                       title={x.title}
                       sub={`${x.items.length} ${x.unit} · ${x.families.length} catégories`}
                       value={sv.best == null ? undefined : `${sv.best}/${x.items.length}`}
@@ -92,7 +89,7 @@ function SortRun({ course, ex }: { course: Course; ex: SortExercise }) {
   const { p } = useTheme();
   const s = useStyles();
   const insets = useSafeAreaInsets();
-  const c = tone(course.color, p);
+  const c = p.accent;
   const [saved, setSaved] = useStored<Saved>(saveKey(id, ex.id), EMPTY);
   const [run, setRun] = useState<Run | null>(null);
   const [ended, setEnded] = useState<{ firstOk: number; total: number; miss: Set<string>; secs: number } | null>(null);
@@ -183,7 +180,7 @@ function SortRun({ course, ex }: { course: Course; ex: SortExercise }) {
                     { borderColor: col ?? p.line, backgroundColor: col ? alpha(col, p.dark ? 0.16 : 0.08) : pressed ? p.surface2 : p.surface },
                     !!run.answer && !col && { opacity: 0.5 },
                   ]}>
-                  <View style={[s.num, { backgroundColor: col ?? toneSoft(course.color, p) }]}>
+                  <View style={[s.num, { backgroundColor: col ?? p.accentSoft }]}>
                     {col ? (
                       <Icon name={isGood ? 'check' : 'close'} size={18} color="#fff" />
                     ) : (
@@ -220,7 +217,7 @@ function SortRun({ course, ex }: { course: Course; ex: SortExercise }) {
         </ScrollView>
         <View style={[s.footer, { paddingBottom: insets.bottom + space.md, backgroundColor: p.bg }]}>
           {run.answer ? (
-            <Button label={run.queue.length > 1 || !ok ? 'Suivante' : 'Voir le bilan'} icon="arrow-right" size="lg" color={course.color} onPress={next} />
+            <Button label={run.queue.length > 1 || !ok ? 'Suivante' : 'Voir le bilan'} icon="arrow-right" size="lg" onPress={next} />
           ) : (
             <Button label="Arrêter la série" kind="ghost" onPress={() => setRun(null)} />
           )}
@@ -246,9 +243,9 @@ function SortRun({ course, ex }: { course: Course; ex: SortExercise }) {
           </Text>
           <View style={{ alignSelf: 'stretch', gap: space.sm, marginTop: space.sm }}>
             {ended.miss.size > 0 && (
-              <Button label={`Refaire mes ${ended.miss.size} erreurs`} icon="refresh" color={course.color} onPress={() => start(ex.items.filter((i) => ended.miss.has(i.name)))} />
+              <Button label={`Refaire mes ${ended.miss.size} erreurs`} icon="refresh" onPress={() => start(ex.items.filter((i) => ended.miss.has(i.name)))} />
             )}
-            <Button label="Nouvelle série" kind={ended.miss.size ? 'soft' : 'primary'} color={course.color} onPress={() => start(ex.items)} />
+            <Button label="Nouvelle série" kind={ended.miss.size ? 'soft' : 'primary'} onPress={() => start(ex.items)} />
           </View>
         </View>
       ) : (
@@ -256,21 +253,21 @@ function SortRun({ course, ex }: { course: Course; ex: SortExercise }) {
           <Text style={[s.over, { color: c }]}>{ex.title}</Text>
           <Text style={s.introTitle}>{ex.intro}</Text>
           <Text style={s.endSub}>
-            Après chaque réponse, tu vois la description du cours et un exemple concret. Une erreur revient en fin de série jusqu’à ce que tu la réussisses.
+            Description et exemple après chaque réponse. Les erreurs reviennent en fin de série.
           </Text>
           <View style={s.stats}>
             <Stat value={String(saved.runs)} label="séries" />
-            <Stat value={saved.best == null ? '–' : `${saved.best}/${ex.items.length}`} label="meilleur score" color={course.color} />
+            <Stat value={saved.best == null ? '–' : `${saved.best}/${ex.items.length}`} label="meilleur score" />
             <Stat value={String(traps.length)} label="pièges" color={traps.length ? p.bad : undefined} />
           </View>
           <View style={{ gap: space.sm }}>
-            <Button label={`Trier les ${ex.items.length} ${ex.unit}`} icon="play" size="lg" color={course.color} onPress={() => start(ex.items)} />
-            {traps.length > 0 && <Button label={`Seulement mes pièges (${traps.length})`} kind="soft" color={course.color} onPress={() => start(traps)} />}
+            <Button label={`Trier les ${ex.items.length} ${ex.unit}`} icon="play" size="lg" onPress={() => start(ex.items)} />
+            {traps.length > 0 && <Button label={`Seulement mes pièges (${traps.length})`} kind="soft" onPress={() => start(traps)} />}
           </View>
         </View>
       )}
 
-      <Section title={ended?.miss.size ? 'Tes erreurs en rouge' : 'Aide-mémoire'}>
+      <Section title={ended?.miss.size ? 'Erreurs en rouge' : 'Aide-mémoire'}>
         {ex.families.map((f) => {
           const list = ex.items.filter((i) => i.family === f.id);
           return (

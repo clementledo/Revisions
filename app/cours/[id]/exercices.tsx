@@ -22,8 +22,6 @@ export default function Exercises() {
 
   return (
     <Screen>
-      <Muted style={{ paddingHorizontal: 2 }}>Réfléchis (ou écris ta réponse sur papier), puis dévoile la correction et dis-moi si tu avais bon.</Muted>
-
       {lessons.map((ch) => {
         const list = exercises.filter(({ q }) => quizChapterOf(course, q) === ch.id);
         if (!list.length && !ch.examples) return null;
@@ -33,7 +31,7 @@ export default function Exercises() {
               <Group>
                 <Row
                   icon="book-open-variant"
-                  color={course.color}
+                 
                   title="Exemples détaillés du cours"
                   sub={`${ch.examples} exemples avec calculs pas à pas`}
                   onPress={() => router.push(`/cours/${id}/lire?ch=${ch.id}&mode=examples`)}
@@ -46,14 +44,14 @@ export default function Exercises() {
               return (
                 <Card key={i} style={{ gap: space.md }}>
                   <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
-                    <Pill label={`Exercice ${list.findIndex((x) => x.i === i) + 1}`} color={course.color} />
+                    <Pill label={`Exercice ${list.findIndex((x) => x.i === i) + 1}`} />
                     <View style={{ flex: 1 }} />
                     {r && <Pill label={r.ok ? 'Su' : 'À retravailler'} icon={r.ok ? 'check' : 'refresh'} color={r.ok ? p.good : p.warn} />}
                   </View>
                   <Text style={s.q}>{q.q}</Text>
                   {shown ? (
                     <>
-                      <View style={[s.sol, { borderLeftColor: tone(course.color, p) }]}>
+                      <View style={[s.sol, { borderLeftColor: p.accent }]}>
                         <Text style={s.solTitle}>Correction</Text>
                         <Text style={s.solText}>{q.e}</Text>
                       </View>
@@ -83,7 +81,7 @@ export default function Exercises() {
                       </View>
                     </>
                   ) : (
-                    <Button kind="soft" color={course.color} label="Voir la correction" icon="eye-outline" onPress={() => setOpen({ ...open, [i]: true })} />
+                    <Button kind="soft" label="Voir la correction" icon="eye-outline" onPress={() => setOpen({ ...open, [i]: true })} />
                   )}
                 </Card>
               );

@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 
 import { Bar, Card, Group, Icon, Ring, RingLabel, Screen, Section, type IconName } from '@/components/ui';
-import { COURSES } from '@/lib/courses';
+import { ACTIVE as COURSES } from "@/lib/courses";
 import { useStoreVersion, useStored } from '@/lib/store';
 import { chapterStats, courseProgress, dayKey, streak } from '@/lib/study';
 import { alpha, makeStyles, radius, shadow, space, tone, type, useTheme } from '@/lib/theme';
@@ -36,7 +36,7 @@ export default function Progress() {
     .slice(0, 3);
 
   return (
-    <Screen title="Progrès" overline={`${activeDays} jour${activeDays > 1 ? 's' : ''} de révision`}>
+    <Screen>
       <View style={s.kpis}>
         <Kpi icon="fire" n={String(streak(days))} l="jours de suite" color={p.warn} />
         <Kpi icon="cards" n={`${mastered}`} l={`cartes maîtrisées sur ${cards}`} color={p.accent} />
