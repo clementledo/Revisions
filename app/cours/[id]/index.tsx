@@ -139,10 +139,10 @@ export default function CourseScreen() {
       },
       {
         icon: "sort-variant",
-        label: "Trier ITIL",
-        sub: `${course.sort?.items.length ?? 0} pratiques`,
+        label: "Tableaux",
+        sub: `${course.sorts?.length ?? 0} à trier`,
         go: `${base}/tri`,
-        show: course.sort,
+        show: course.sorts?.length,
       },
       {
         icon: "timer-outline",

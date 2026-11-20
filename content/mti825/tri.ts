@@ -221,4 +221,13 @@ const items: SortItem[] = [
   },
 ];
 
-export const itilSort: SortExercise = { title: 'Pratiques ITIL 4', families, items };
+export const itilSort: SortExercise = {
+  id: 'itil',
+  title: 'Les 34 pratiques ITIL 4',
+  chapter: 'itil',
+  intro: 'Une pratique s’affiche : range-la dans sa famille.',
+  prompt: 'Dans quelle famille ?',
+  unit: 'pratiques',
+  families,
+  items,
+};

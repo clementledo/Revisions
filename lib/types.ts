@@ -34,7 +34,19 @@ export type Question = {
 /** Exercice de tri : ranger chaque élément dans sa famille (ex. pratiques ITIL). */
 export type SortFamily = { id: string; title: string; sub: string };
 export type SortItem = { name: string; family: string; def: string; ex: string };
-export type SortExercise = { title: string; families: SortFamily[]; items: SortItem[] };
+export type SortExercise = {
+  id: string;
+  title: string;
+  /** Chapitre de la page dont vient le tableau. */
+  chapter: string;
+  intro: string;
+  /** Question posée sur chaque carte (« Dans quelle famille ? »). */
+  prompt: string;
+  /** Nom des éléments au pluriel (« pratiques »). */
+  unit: string;
+  families: SortFamily[];
+  items: SortItem[];
+};
 
 export type Card = { id: string; ch: string; q: string; a: string };
 
@@ -60,8 +72,8 @@ export type Course = {
   quizChapters: Record<number, string[]>;
   questions: Question[];
   cards: Card[];
-  /** Exercice de tri propre au cours. */
-  sort?: SortExercise;
+  /** Exercices de tri du cours (tableaux à apprendre). */
+  sorts?: SortExercise[];
   /** Mots du nom de fichier qui désignent une partie (nom sans accents, en minuscules), testés dans l'ordre. */
   slideKeys?: [string, RegExp][];
 };

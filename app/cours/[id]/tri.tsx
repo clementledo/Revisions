@@ -1,16 +1,18 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Bar, Button, Card, Icon, Pill, Ring, Section, Stat } from '@/components/ui';
+import { Bar, Button, Card, Group, Icon, Pill, Ring, Row, Section, Stat } from '@/components/ui';
 import { courseById } from '@/lib/courses';
-import { useStored } from '@/lib/store';
+import { read, useStored, useStoreVersion } from '@/lib/store';
 import { logActivity } from '@/lib/study';
 import { alpha, makeStyles, radius, shadow, space, tone, toneSoft, type, useTheme } from '@/lib/theme';
-import type { SortItem } from '@/lib/types';
+import type { Course, SortExercise, SortItem } from '@/lib/types';
 
 type Saved = { err: Record<string, number>; runs: number; best: number | null };
+const EMPTY: Saved = { err: {}, runs: 0, best: null };
+const saveKey = (course: string, ex: string) => `tri:${course}:${ex}`;
 type Run = {
   queue: SortItem[];
   total: number;
@@ -36,14 +38,62 @@ const shuffle = <T,>(a: T[]) => {
 
 /** Exercice de tri : chaque pratique s'affiche, on la range dans sa famille ; une erreur revient en fin de série. */
 export default function SortScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, ex: exId } = useLocalSearchParams<{ id: string; ex?: string }>();
   const course = courseById(id)!;
-  const ex = course.sort!;
+  const sorts = course.sorts ?? [];
+  const ex = sorts.find((x) => x.id === exId) ?? (sorts.length === 1 ? sorts[0] : null);
+  return ex ? <SortRun course={course} ex={ex} key={ex.id} /> : <SortList course={course} />;
+}
+
+/** Liste des tableaux à trier du cours, avec le meilleur score de chacun. */
+function SortList({ course }: { course: Course }) {
+  const router = useRouter();
+  const { p } = useTheme();
+  const s = useStyles();
+  const insets = useSafeAreaInsets();
+  useStoreVersion();
+  const sorts = course.sorts ?? [];
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: p.bg }} contentContainerStyle={[s.content, { paddingBottom: insets.bottom + 40 }]}>
+      <Stack.Screen options={{ title: 'Tableaux à trier' }} />
+      <Text style={s.listIntro}>
+        Les tableaux à connaître par cœur, en exercices de tri. Après chaque réponse : la description du cours et un exemple concret.
+      </Text>
+      {course.chapters
+        .filter((ch) => sorts.some((x) => x.chapter === ch.id))
+        .map((ch) => (
+          <Section key={ch.id} title={ch.eyebrow || ch.title}>
+            <Group>
+              {sorts
+                .filter((x) => x.chapter === ch.id)
+                .map((x) => {
+                  const sv = read<Saved>(saveKey(course.id, x.id), EMPTY);
+                  return (
+                    <Row
+                      key={x.id}
+                      icon="sort-variant"
+                      color={course.color}
+                      title={x.title}
+                      sub={`${x.items.length} ${x.unit} · ${x.families.length} catégories`}
+                      value={sv.best == null ? undefined : `${sv.best}/${x.items.length}`}
+                      onPress={() => router.push(`/cours/${course.id}/tri?ex=${x.id}`)}
+                    />
+                  );
+                })}
+            </Group>
+          </Section>
+        ))}
+    </ScrollView>
+  );
+}
+
+function SortRun({ course, ex }: { course: Course; ex: SortExercise }) {
+  const id = course.id;
   const { p } = useTheme();
   const s = useStyles();
   const insets = useSafeAreaInsets();
   const c = tone(course.color, p);
-  const [saved, setSaved] = useStored<Saved>(`tri:${id}`, { err: {}, runs: 0, best: null });
+  const [saved, setSaved] = useStored<Saved>(saveKey(id, ex.id), EMPTY);
   const [run, setRun] = useState<Run | null>(null);
   const [ended, setEnded] = useState<{ firstOk: number; total: number; miss: Set<string>; secs: number } | null>(null);
   const scroll = useRef<ScrollView>(null);
@@ -87,7 +137,7 @@ export default function SortScreen() {
     scroll.current?.scrollTo({ y: 0, animated: false });
   };
 
-  const title = `Trier · ${ex.title}`;
+  const title = ex.title;
 
   // ---------- série en cours
   if (run) {
@@ -95,6 +145,8 @@ export default function SortScreen() {
     const retry = run.seen.has(item.name) && !run.answer;
     const ok = run.answer === item.family;
     const fam = family(item.family);
+    // Beaucoup de catégories (les 8 gaspillages) : boutons sur une ligne, sans sous-titre.
+    const compact = ex.families.length > 4;
     return (
       <View style={{ flex: 1, backgroundColor: p.bg }}>
         <Stack.Screen options={{ title }} />
@@ -109,10 +161,10 @@ export default function SortScreen() {
         <ScrollView ref={scroll} contentContainerStyle={[s.content, { paddingBottom: insets.bottom + 120 }]}>
           <View style={[s.card, shadow(p, 2)]}>
             <View style={s.cardHead}>
-              <Text style={[s.over, { color: c }]}>Dans quelle famille ?</Text>
+              <Text style={[s.over, { color: c }]}>{ex.prompt}</Text>
               {retry && <Pill label="Deuxième chance" color={p.bad} icon="refresh" />}
             </View>
-            <Text style={s.name}>{item.name}</Text>
+            <Text style={[s.name, item.name.length > 40 && s.nameLong]}>{item.name}</Text>
           </View>
 
           <View style={{ gap: space.sm }}>
@@ -127,6 +179,7 @@ export default function SortScreen() {
                   onPress={() => answer(f.id)}
                   style={({ pressed }) => [
                     s.choice,
+                    compact && { paddingVertical: 10 },
                     { borderColor: col ?? p.line, backgroundColor: col ? alpha(col, p.dark ? 0.16 : 0.08) : pressed ? p.surface2 : p.surface },
                     !!run.answer && !col && { opacity: 0.5 },
                   ]}>
@@ -139,7 +192,7 @@ export default function SortScreen() {
                   </View>
                   <View style={{ flex: 1, gap: 2 }}>
                     <Text style={s.choiceTitle}>{f.title}</Text>
-                    <Text style={s.choiceSub}>{f.sub}</Text>
+                    {!compact && <Text style={s.choiceSub}>{f.sub}</Text>}
                   </View>
                 </Pressable>
               );
@@ -201,9 +254,9 @@ export default function SortScreen() {
       ) : (
         <View style={[s.card, shadow(p, 2)]}>
           <Text style={[s.over, { color: c }]}>{ex.title}</Text>
-          <Text style={s.introTitle}>Range les {ex.items.length} pratiques dans leur famille</Text>
+          <Text style={s.introTitle}>{ex.intro}</Text>
           <Text style={s.endSub}>
-            Après chaque réponse, tu vois la définition et un exemple concret. Une erreur revient en fin de série jusqu’à ce que tu la réussisses.
+            Après chaque réponse, tu vois la description du cours et un exemple concret. Une erreur revient en fin de série jusqu’à ce que tu la réussisses.
           </Text>
           <View style={s.stats}>
             <Stat value={String(saved.runs)} label="séries" />
@@ -211,7 +264,7 @@ export default function SortScreen() {
             <Stat value={String(traps.length)} label="pièges" color={traps.length ? p.bad : undefined} />
           </View>
           <View style={{ gap: space.sm }}>
-            <Button label={`Trier les ${ex.items.length} pratiques`} icon="play" size="lg" color={course.color} onPress={() => start(ex.items)} />
+            <Button label={`Trier les ${ex.items.length} ${ex.unit}`} icon="play" size="lg" color={course.color} onPress={() => start(ex.items)} />
             {traps.length > 0 && <Button label={`Seulement mes pièges (${traps.length})`} kind="soft" color={course.color} onPress={() => start(traps)} />}
           </View>
         </View>
@@ -260,6 +313,8 @@ const useStyles = makeStyles((p) => ({
   cardHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
   over: { ...type.overline },
   name: { ...type.title, fontSize: 28, lineHeight: 34, color: p.text, textAlign: 'center', paddingVertical: space.lg },
+  nameLong: { fontSize: 21, lineHeight: 28, letterSpacing: -0.3, paddingVertical: space.sm },
+  listIntro: { ...type.callout, color: p.muted },
   choice: { flexDirection: 'row', alignItems: 'center', gap: 14, borderWidth: 1.5, borderRadius: radius.lg, paddingVertical: 14, paddingHorizontal: 14 },
   num: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   numText: { fontFamily: 'Inter', fontWeight: '800', fontSize: 15 },
